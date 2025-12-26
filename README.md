@@ -1,6 +1,6 @@
 # Cozify
 
-A modern anime streaming web application built with React. Cozify provides a seamless viewing experience with an elegant interface, intelligent video player, and comprehensive user tracking features.
+A modern anime streaming web application built with React. Cozify provides a seamless viewing experience with an elegant interface, custom HLS video player, and comprehensive user tracking features.
 
 ![Home Page](screenshots/home.png)
 
@@ -17,6 +17,7 @@ Live Demo: [https://kirazul.github.io/Cozify/](https://kirazul.github.io/Cozify/
 - [Overview](#overview)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
 - [API Reference](#api-reference)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
@@ -27,7 +28,7 @@ Live Demo: [https://kirazul.github.io/Cozify/](https://kirazul.github.io/Cozify/
 
 ## Overview
 
-Cozify is a single-page application designed for anime enthusiasts. It aggregates anime content through the YumaAPI, providing access to a vast library of anime series with both subbed and dubbed options. The application focuses on user experience with features like watch history tracking, achievement trophies, and an intelligent video player with automatic retry logic.
+Cozify is a single-page application designed for anime enthusiasts. It aggregates anime content through the YumaAPI, providing access to a vast library of anime series with both subbed and dubbed options. The application features a custom HLS video player with subtitle support, quality selection, and a dedicated backend proxy for CORS-free streaming.
 
 ---
 
@@ -41,12 +42,18 @@ Cozify is a single-page application designed for anime enthusiasts. It aggregate
 - Daily airing schedule
 
 ### Video Player
-- Intelligent retry system with automatic server switching
-- Cycles through 3 streaming servers (s-1, s-2, s-3)
-- Automatic fallback from SUB to DUB (or vice versa) on failure
-- 12-second load timeout with auto-retry
-- Manual server and audio selection on error
-- Keyboard shortcuts (F: fullscreen, N: next, P: previous, R: retry)
+- Custom HLS.js-based player with full controls
+- Subtitle support with multiple language options (auto-selects English)
+- Quality selection (Auto, 1080p, 720p, 360p)
+- Playback speed control (0.25x to 2x)
+- Instant seeking with visual feedback
+- Keyboard shortcuts:
+  - Space/K: Play/Pause
+  - F: Fullscreen
+  - M: Mute
+  - N: Next episode
+  - P: Previous episode
+  - Arrow keys: Seek 10 seconds
 
 ### User Profile System
 - Welcome modal for first-time visitors
@@ -74,39 +81,56 @@ Cozify is a single-page application designed for anime enthusiasts. It aggregate
 | HLS.js | HTTP Live Streaming support |
 | CSS3 | Styling with custom properties |
 | LocalStorage | Client-side data persistence |
+| Deno Deploy | Backend proxy server |
+
+---
+
+## Architecture
+
+Cozify uses a two-tier architecture:
+
+### Frontend (GitHub Pages)
+- React SPA hosted on GitHub Pages
+- Communicates with the backend proxy for all streaming data
+
+### Backend Proxy (Deno Deploy)
+- Hosted at `https://cozify-api.deno.dev`
+- Proxies YumaAPI requests to bypass CORS
+- Rewrites HLS playlist URLs for seamless streaming
+- Proxies subtitle VTT files for cross-origin access
 
 ---
 
 ## API Reference
 
-Cozify uses the YumaAPI for fetching anime data. The API scrapes HiAnime.to in real-time.
+Cozify uses a custom Deno Deploy backend that proxies the YumaAPI.
 
-### Base URL
+### Backend Base URL
 ```
-/api
+https://cozify-api.deno.dev
 ```
 
 ### Endpoints
 
 | Endpoint | Description |
 |----------|-------------|
-| `/search/{query}` | Search anime by title |
-| `/search-suggestions/{query}` | Get search autocomplete suggestions |
-| `/info/{anime_id}` | Get detailed anime information and episode list |
-| `/watch?episodeId={id}&type={sub\|dub}` | Get video streaming sources |
-| `/recent-episodes` | Fetch recently updated episodes |
-| `/top-airing` | Get current top airing anime |
-| `/spotlight` | Get featured spotlight anime |
-| `/genre/list` | List all available genres |
-| `/genre/{genre_name}` | Get anime by genre |
-| `/studio/{studio_id}` | Get anime by studio |
-| `/schedule/{YYYY-MM-DD}` | Get airing schedule for a date |
+| `/api/search/{query}` | Search anime by title |
+| `/api/info/{anime_id}` | Get detailed anime information and episode list |
+| `/watch?episodeId={id}&type={sub\|dub}` | Get proxied video streaming sources |
+| `/stream?url={m3u8_url}` | Proxy HLS streams with CORS headers |
+| `/subtitle?url={vtt_url}` | Proxy subtitle files |
+| `/api/recent-episodes` | Fetch recently updated episodes |
+| `/api/top-airing` | Get current top airing anime |
+| `/api/spotlight` | Get featured spotlight anime |
+| `/api/genre/{genre_name}` | Get anime by genre |
+| `/api/schedule/{YYYY-MM-DD}` | Get airing schedule for a date |
 
-### Video Streaming
-Video playback uses embedded players from megaplay.buzz with the following URL structure:
-```
-https://megaplay.buzz/stream/{server}/{episode_number}/{audio_type}
-```
+### Video Streaming Flow
+1. Frontend requests `/watch` with episode ID
+2. Backend fetches sources from YumaAPI
+3. Backend rewrites source URLs to go through `/stream` proxy
+4. HLS.js loads the proxied m3u8 playlist
+5. All segment requests are automatically proxied
 
 ---
 
@@ -121,7 +145,8 @@ cozify/
 │   │   └── index.js          # API service layer
 │   ├── components/
 │   │   ├── Header.jsx        # Navigation header
-│   │   ├── VideoPlayer.jsx   # Video player with retry logic
+│   │   ├── VideoPlayer.jsx   # Custom HLS player with settings
+│   │   ├── VideoPlayer.css   # Player styles
 │   │   ├── AnimeCard.jsx     # Anime card component
 │   │   ├── TrendingCarousel.jsx
 │   │   ├── TopTen.jsx
@@ -142,6 +167,10 @@ cozify/
 ├── index.html
 ├── package.json
 └── vite.config.js
+
+cozify-server/
+├── main.ts                   # Deno Deploy backend
+└── deno.json                 # Deno configuration
 ```
 
 ---
@@ -156,7 +185,7 @@ cozify/
 
 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/Kirazul/Cozify.git
 cd cozify
 ```
 
@@ -206,7 +235,7 @@ User statistics, watch history, continue watching section, and trophy achievemen
 ## Configuration
 
 ### Vite Configuration
-The project uses Vite with React plugin. API requests are proxied through the dev server configuration in `vite.config.js`.
+The project uses Vite with React plugin. The base path is configured for GitHub Pages deployment.
 
 ### Color Scheme
 Primary accent color: `#ffbade` (Pink)
@@ -224,4 +253,4 @@ This project is for educational purposes only. All anime content is provided thr
 
 - YumaAPI for providing the anime data API
 - HiAnime.to as the data source
-- megaplay.buzz for video streaming infrastructure
+- Deno Deploy for backend hosting

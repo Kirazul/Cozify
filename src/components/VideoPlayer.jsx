@@ -2,19 +2,19 @@ import { useRef, useState, useCallback, useEffect } from 'react'
 import Hls from 'hls.js'
 import './VideoPlayer.css'
 
-// Deno Deploy backend URL
 const API_BASE = 'https://cozify-api.deno.dev'
 
-export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPrev, hasNext, hasPrev, onAudioTypeChange }) {
+export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPrev, hasNext, hasPrev }) {
   const containerRef = useRef(null)
   const videoRef = useRef(null)
   const hlsRef = useRef(null)
   const idleTimerRef = useRef(null)
+  const trackRef = useRef(null)
   
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [currentAudio, setCurrentAudio] = useState(audioType)
   const [showControls, setShowControls] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
   
   const [playing, setPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -22,15 +22,26 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   const [volume, setVolume] = useState(1)
   const [muted, setMuted] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
+  const [seeking, setSeeking] = useState(false)
+  
+  // Settings state
+  const [subtitles, setSubtitles] = useState([])
+  const [currentSubtitle, setCurrentSubtitle] = useState('off')
+  const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  const [qualities, setQualities] = useState([])
+  const [currentQuality, setCurrentQuality] = useState(-1)
 
   // Reset on episode change
   useEffect(() => {
     setLoading(true)
     setError(null)
-    setCurrentAudio(audioType)
     setPlaying(false)
     setCurrentTime(0)
     setDuration(0)
+    setSubtitles([])
+    setCurrentSubtitle('off')
+    setQualities([])
+    setCurrentQuality(-1)
   }, [episodeId, audioType])
 
   // Cleanup
@@ -50,7 +61,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
       setError(null)
 
       try {
-        const url = `${API_BASE}/watch?episodeId=${encodeURIComponent(episodeId)}&type=${currentAudio}`
+        const url = `${API_BASE}/watch?episodeId=${encodeURIComponent(episodeId)}&type=${audioType}`
         const res = await fetch(url)
         
         if (!res.ok) throw new Error('Failed to fetch sources')
@@ -59,6 +70,16 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
         
         if (!data.sources || data.sources.length === 0) {
           throw new Error('No sources available')
+        }
+
+        // Store subtitles
+        if (data.subtitles && data.subtitles.length > 0) {
+          setSubtitles(data.subtitles)
+          // Auto-select English if available
+          const english = data.subtitles.find(s => s.lang.toLowerCase().includes('english'))
+          if (english) {
+            setCurrentSubtitle(english.url)
+          }
         }
 
         const source = data.sources[0]
@@ -73,11 +94,18 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           hls.loadSource(source.url)
           hls.attachMedia(video)
           
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
             setLoading(false)
+            if (data.levels && data.levels.length > 0) {
+              setQualities(data.levels.map((level, idx) => ({
+                index: idx,
+                height: level.height,
+                label: `${level.height}p`
+              })))
+            }
             const playPromise = video.play()
             if (playPromise !== undefined) {
-              playPromise.catch(() => {}) // Ignore autoplay errors
+              playPromise.catch(() => {})
             }
           })
           
@@ -104,16 +132,72 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     }
 
     loadSource()
-  }, [episodeId, currentAudio])
+  }, [episodeId, audioType])
+
+  // Handle subtitle change
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    
+    // Remove existing track
+    if (trackRef.current && trackRef.current.parentNode) {
+      trackRef.current.parentNode.removeChild(trackRef.current)
+      trackRef.current = null
+    }
+    
+    // Disable all existing text tracks
+    for (let i = 0; i < video.textTracks.length; i++) {
+      video.textTracks[i].mode = 'disabled'
+    }
+    
+    if (currentSubtitle !== 'off') {
+      const track = document.createElement('track')
+      track.kind = 'subtitles'
+      track.label = 'Subtitles'
+      track.srclang = 'en'
+      track.src = currentSubtitle
+      track.default = true
+      video.appendChild(track)
+      trackRef.current = track
+      
+      // Wait for track to load then enable it
+      track.addEventListener('load', () => {
+        if (video.textTracks.length > 0) {
+          video.textTracks[video.textTracks.length - 1].mode = 'showing'
+        }
+      })
+      
+      // Also try to enable immediately
+      setTimeout(() => {
+        if (video.textTracks.length > 0) {
+          video.textTracks[video.textTracks.length - 1].mode = 'showing'
+        }
+      }, 100)
+    }
+  }, [currentSubtitle])
+
+  // Handle quality change
+  useEffect(() => {
+    if (hlsRef.current) {
+      hlsRef.current.currentLevel = currentQuality
+    }
+  }, [currentQuality])
+
+  // Handle playback speed change
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = playbackSpeed
+    }
+  }, [playbackSpeed])
 
   // Mouse idle
   const handleMouseMove = useCallback(() => {
     setShowControls(true)
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
     idleTimerRef.current = setTimeout(() => {
-      if (playing) setShowControls(false)
+      if (playing && !showSettings) setShowControls(false)
     }, 3000)
-  }, [playing])
+  }, [playing, showSettings])
 
   useEffect(() => {
     const container = containerRef.current
@@ -132,7 +216,10 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     const rect = e.currentTarget.getBoundingClientRect()
     const percent = (e.clientX - rect.left) / rect.width
     if (videoRef.current && duration) {
-      videoRef.current.currentTime = percent * duration
+      const newTime = percent * duration
+      setCurrentTime(newTime) // Update UI immediately
+      setSeeking(true)
+      videoRef.current.currentTime = newTime
     }
   }
 
@@ -165,15 +252,11 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   const handleRetry = () => {
     setLoading(true)
     setError(null)
-    // Toggle audio to try different source
-    const newAudio = currentAudio === 'sub' ? 'dub' : 'sub'
-    setCurrentAudio(newAudio)
-    onAudioTypeChange?.(newAudio)
-  }
-
-  const switchAudio = (audio) => {
-    setCurrentAudio(audio)
-    onAudioTypeChange?.(audio)
+    // Re-trigger load
+    const video = videoRef.current
+    if (video && hlsRef.current) {
+      hlsRef.current.destroy()
+    }
   }
 
   const formatTime = (s) => {
@@ -186,7 +269,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   // Keyboard shortcuts
   useEffect(() => {
     const onKey = (e) => {
-      if (e.target.tagName === 'INPUT') return
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return
       switch (e.key.toLowerCase()) {
         case ' ':
         case 'k': e.preventDefault(); togglePlay(); break
@@ -196,6 +279,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
         case 'm': toggleMute(); break
         case 'arrowleft': if (videoRef.current) videoRef.current.currentTime -= 10; break
         case 'arrowright': if (videoRef.current) videoRef.current.currentTime += 10; break
+        case 'escape': setShowSettings(false); break
       }
     }
     window.addEventListener('keydown', onKey)
@@ -225,10 +309,9 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           <h3>Playback Error</h3>
           <p>{error.message}</p>
           <span className="error-details">{error.details}</span>
-          
           <div className="error-actions">
             <button className="retry-btn primary" onClick={handleRetry}>
-              Try {currentAudio === 'sub' ? 'DUB' : 'SUB'}
+              Retry
             </button>
           </div>
         </div>
@@ -244,6 +327,12 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           <p>Loading...</p>
         </div>
       )}
+      
+      {seeking && !loading && (
+        <div className="player-seeking">
+          <div className="seeking-spinner"></div>
+        </div>
+      )}
 
       <video
         ref={videoRef}
@@ -252,9 +341,63 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
         onLoadedMetadata={() => setDuration(videoRef.current?.duration || 0)}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
+        onSeeked={() => setSeeking(false)}
+        onSeeking={() => setSeeking(true)}
         onEnded={() => hasNext && onNext?.()}
         playsInline
+        crossOrigin="anonymous"
       />
+
+      {/* Settings Panel */}
+      {showSettings && (
+        <div className="settings-panel" onClick={e => e.stopPropagation()}>
+          <div className="settings-header">
+            <span>Settings</span>
+            <button className="settings-close" onClick={() => setShowSettings(false)}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+          </div>
+          
+          {/* Subtitles */}
+          <div className="settings-section">
+            <label>Subtitles</label>
+            <select value={currentSubtitle} onChange={e => setCurrentSubtitle(e.target.value)}>
+              <option value="off">Off</option>
+              {subtitles.map((sub, i) => (
+                <option key={i} value={sub.url}>{sub.lang}</option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Quality */}
+          {qualities.length > 0 && (
+            <div className="settings-section">
+              <label>Quality</label>
+              <select value={currentQuality} onChange={e => setCurrentQuality(parseInt(e.target.value))}>
+                <option value={-1}>Auto</option>
+                {qualities.map(q => (
+                  <option key={q.index} value={q.index}>{q.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          
+          {/* Playback Speed */}
+          <div className="settings-section">
+            <label>Speed</label>
+            <select value={playbackSpeed} onChange={e => setPlaybackSpeed(parseFloat(e.target.value))}>
+              <option value={0.25}>0.25x</option>
+              <option value={0.5}>0.5x</option>
+              <option value={0.75}>0.75x</option>
+              <option value={1}>Normal</option>
+              <option value={1.25}>1.25x</option>
+              <option value={1.5}>1.5x</option>
+              <option value={1.75}>1.75x</option>
+              <option value={2}>2x</option>
+            </select>
+          </div>
+        </div>
+      )}
 
       <div className={`player-controls ${showControls ? 'visible' : ''}`} onClick={e => e.stopPropagation()}>
         <div className="progress-bar" onClick={handleSeek}>
@@ -298,10 +441,16 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           </div>
 
           <div className="controls-right">
-            <div className="audio-toggle">
-              <button className={`audio-btn ${currentAudio === 'sub' ? 'active' : ''}`} onClick={() => switchAudio('sub')}>SUB</button>
-              <button className={`audio-btn ${currentAudio === 'dub' ? 'active' : ''}`} onClick={() => switchAudio('dub')}>DUB</button>
-            </div>
+            {/* Subtitle indicator */}
+            {currentSubtitle !== 'off' && (
+              <span className="subtitle-indicator">CC</span>
+            )}
+            
+            {/* Settings button */}
+            <button className="ctrl-btn" onClick={() => setShowSettings(!showSettings)} title="Settings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            </button>
+            
             <button className="ctrl-btn" onClick={toggleFullscreen}>
               {fullscreen ? (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16h3v3h2v-5H5zm3-8H5v2h5V5H8zm6 11h2v-3h3v-2h-5zm2-11V5h-2v5h5V8z"/></svg>
