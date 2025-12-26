@@ -1,193 +1,150 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
+import Hls from 'hls.js'
 import './VideoPlayer.css'
 
-const SERVERS = ['s-2', 's-1', 's-3']
-const MAX_RETRIES = 6
-const LOAD_TIMEOUT = 12000 // 12 seconds
-const VERIFY_DELAY = 3000 // 3 seconds after load to verify
+// Deno Deploy backend URL
+const API_BASE = 'https://cozify-api.deno.dev'
 
 export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPrev, hasNext, hasPrev, onAudioTypeChange }) {
   const containerRef = useRef(null)
-  const iframeRef = useRef(null)
-  const timeoutRef = useRef(null)
-  const verifyTimeoutRef = useRef(null)
+  const videoRef = useRef(null)
+  const hlsRef = useRef(null)
   const idleTimerRef = useRef(null)
   
-  const [fullscreen, setFullscreen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [retryCount, setRetryCount] = useState(0)
-  const [currentServer, setCurrentServer] = useState(0)
   const [currentAudio, setCurrentAudio] = useState(audioType)
-  const [triedCombinations, setTriedCombinations] = useState(new Set())
-  const [showOverlay, setShowOverlay] = useState(true)
-  const [iframeKey, setIframeKey] = useState(0)
-
-  // Extract numeric episode ID: "anime-name-123$episode$456789" -> "456789"
-  const epNumber = episodeId?.split('$episode$')[1] || null
+  const [showControls, setShowControls] = useState(true)
   
-  // Build embed URL with current server and audio type
-  const embedUrl = epNumber 
-    ? `https://megaplay.buzz/stream/${SERVERS[currentServer]}/${epNumber}/${currentAudio}`
-    : null
+  const [playing, setPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [muted, setMuted] = useState(false)
+  const [fullscreen, setFullscreen] = useState(false)
 
-  // Reset state when episode or audio type changes externally
+  // Reset on episode change
   useEffect(() => {
     setLoading(true)
     setError(null)
-    setRetryCount(0)
-    setCurrentServer(0)
     setCurrentAudio(audioType)
-    setTriedCombinations(new Set())
-    setIframeKey(prev => prev + 1)
+    setPlaying(false)
+    setCurrentTime(0)
+    setDuration(0)
   }, [episodeId, audioType])
 
-  // Clear timeouts on unmount
+  // Cleanup
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      if (verifyTimeoutRef.current) clearTimeout(verifyTimeoutRef.current)
+      if (hlsRef.current) hlsRef.current.destroy()
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
     }
   }, [])
 
-  // Mouse idle detection for overlay
+  // Load video source
+  useEffect(() => {
+    if (!episodeId) return
+
+    const loadSource = async () => {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const url = `${API_BASE}/watch?episodeId=${encodeURIComponent(episodeId)}&type=${currentAudio}`
+        const res = await fetch(url)
+        
+        if (!res.ok) throw new Error('Failed to fetch sources')
+        
+        const data = await res.json()
+        
+        if (!data.sources || data.sources.length === 0) {
+          throw new Error('No sources available')
+        }
+
+        const source = data.sources[0]
+        const video = videoRef.current
+        if (!video) return
+
+        if (hlsRef.current) hlsRef.current.destroy()
+
+        if (Hls.isSupported()) {
+          const hls = new Hls({ enableWorker: true })
+          hlsRef.current = hls
+          hls.loadSource(source.url)
+          hls.attachMedia(video)
+          
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            setLoading(false)
+            video.play().catch(() => {})
+          })
+          
+          hls.on(Hls.Events.ERROR, (_, data) => {
+            if (data.fatal) {
+              setLoading(false)
+              setError({ message: 'Stream error', details: data.details })
+            }
+          })
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = source.url
+          video.addEventListener('loadedmetadata', () => {
+            setLoading(false)
+            video.play().catch(() => {})
+          }, { once: true })
+        }
+      } catch (err) {
+        setLoading(false)
+        setError({ message: err.message || 'Failed to load', details: 'Try a different server or audio type' })
+      }
+    }
+
+    loadSource()
+  }, [episodeId, currentAudio])
+
+  // Mouse idle
   const handleMouseMove = useCallback(() => {
-    setShowOverlay(true)
+    setShowControls(true)
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
     idleTimerRef.current = setTimeout(() => {
-      setShowOverlay(false)
-    }, 2000)
-  }, [])
+      if (playing) setShowControls(false)
+    }, 3000)
+  }, [playing])
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
-    
     container.addEventListener('mousemove', handleMouseMove)
-    container.addEventListener('mouseenter', handleMouseMove)
-    
-    return () => {
-      container.removeEventListener('mousemove', handleMouseMove)
-      container.removeEventListener('mouseenter', handleMouseMove)
-    }
+    return () => container.removeEventListener('mousemove', handleMouseMove)
   }, [handleMouseMove])
 
-  const getCombinationKey = (server, audio) => `${server}-${audio}`
-
-  const tryNextCombination = useCallback(() => {
-    const currentKey = getCombinationKey(currentServer, currentAudio)
-    const newTried = new Set(triedCombinations)
-    newTried.add(currentKey)
-    setTriedCombinations(newTried)
-
-    const alternateAudio = currentAudio === 'sub' ? 'dub' : 'sub'
-    
-    // Try next server with same audio
-    for (let s = 0; s < SERVERS.length; s++) {
-      const key = getCombinationKey(s, currentAudio)
-      if (!newTried.has(key)) {
-        setCurrentServer(s)
-        setLoading(true)
-        setError(null)
-        setIframeKey(prev => prev + 1)
-        return true
-      }
+  const togglePlay = () => {
+    if (videoRef.current) {
+      playing ? videoRef.current.pause() : videoRef.current.play()
     }
-    
-    // Try servers with alternate audio
-    for (let s = 0; s < SERVERS.length; s++) {
-      const key = getCombinationKey(s, alternateAudio)
-      if (!newTried.has(key)) {
-        setCurrentServer(s)
-        setCurrentAudio(alternateAudio)
-        onAudioTypeChange?.(alternateAudio)
-        setLoading(true)
-        setError(null)
-        setIframeKey(prev => prev + 1)
-        return true
-      }
+  }
+
+  const handleSeek = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const percent = (e.clientX - rect.left) / rect.width
+    if (videoRef.current && duration) {
+      videoRef.current.currentTime = percent * duration
     }
-    
-    return false
-  }, [currentServer, currentAudio, triedCombinations, onAudioTypeChange])
+  }
 
-  const handleLoadError = useCallback((reason = 'Failed to load') => {
-    if (retryCount < MAX_RETRIES && tryNextCombination()) {
-      setRetryCount(prev => prev + 1)
-    } else {
-      setLoading(false)
-      setError({
-        message: reason,
-        details: `Tried ${triedCombinations.size + 1} server/audio combinations`,
-        canRetry: true
-      })
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !muted
+      setMuted(!muted)
     }
-  }, [retryCount, tryNextCombination, triedCombinations.size])
+  }
 
-  // Set load timeout - auto retry if takes too long
-  useEffect(() => {
-    if (!loading || !epNumber) return
-    
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    
-    timeoutRef.current = setTimeout(() => {
-      if (loading) {
-        console.log('Load timeout, trying next server...')
-        handleLoadError('Player took too long to load')
-      }
-    }, LOAD_TIMEOUT)
-
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+  const handleVolumeChange = (e) => {
+    const val = parseFloat(e.target.value)
+    if (videoRef.current) {
+      videoRef.current.volume = val
+      setVolume(val)
+      setMuted(val === 0)
     }
-  }, [loading, epNumber, currentServer, currentAudio, iframeKey, handleLoadError])
-
-  const handleIframeLoad = useCallback(() => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    
-    // Set a verification timeout - if still seems broken after delay, retry
-    verifyTimeoutRef.current = setTimeout(() => {
-      // The iframe loaded but we can't verify content, assume it's working
-      setLoading(false)
-      setError(null)
-    }, VERIFY_DELAY)
-    
-    // Immediately hide loading for better UX
-    setLoading(false)
-    setError(null)
-  }, [])
-
-  const handleIframeError = useCallback(() => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    if (verifyTimeoutRef.current) clearTimeout(verifyTimeoutRef.current)
-    handleLoadError('Stream unavailable')
-  }, [handleLoadError])
-
-  const handleRetry = useCallback(() => {
-    setRetryCount(0)
-    setCurrentServer(0)
-    setCurrentAudio(audioType)
-    setTriedCombinations(new Set())
-    setLoading(true)
-    setError(null)
-    setIframeKey(prev => prev + 1)
-  }, [audioType])
-
-  const handleForceServer = useCallback((serverIdx) => {
-    setCurrentServer(serverIdx)
-    setLoading(true)
-    setError(null)
-    setIframeKey(prev => prev + 1)
-  }, [])
-
-  const handleForceAudio = useCallback((audio) => {
-    setCurrentAudio(audio)
-    onAudioTypeChange?.(audio)
-    setLoading(true)
-    setError(null)
-    setIframeKey(prev => prev + 1)
-  }, [onAudioTypeChange])
+  }
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -199,21 +156,47 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     }
   }, [])
 
+  const handleRetry = () => {
+    setLoading(true)
+    setError(null)
+    // Toggle audio to try different source
+    const newAudio = currentAudio === 'sub' ? 'dub' : 'sub'
+    setCurrentAudio(newAudio)
+    onAudioTypeChange?.(newAudio)
+  }
+
+  const switchAudio = (audio) => {
+    setCurrentAudio(audio)
+    onAudioTypeChange?.(audio)
+  }
+
+  const formatTime = (s) => {
+    if (!s || isNaN(s)) return '0:00'
+    const m = Math.floor(s / 60)
+    const sec = Math.floor(s % 60)
+    return `${m}:${sec.toString().padStart(2, '0')}`
+  }
+
+  // Keyboard shortcuts
   useEffect(() => {
     const onKey = (e) => {
       if (e.target.tagName === 'INPUT') return
       switch (e.key.toLowerCase()) {
+        case ' ':
+        case 'k': e.preventDefault(); togglePlay(); break
         case 'f': toggleFullscreen(); break
-        case 'n': if (hasNext && onNext) onNext(); break
-        case 'p': if (hasPrev && onPrev) onPrev(); break
-        case 'r': handleRetry(); break
+        case 'n': if (hasNext) onNext?.(); break
+        case 'p': if (hasPrev) onPrev?.(); break
+        case 'm': toggleMute(); break
+        case 'arrowleft': if (videoRef.current) videoRef.current.currentTime -= 10; break
+        case 'arrowright': if (videoRef.current) videoRef.current.currentTime += 10; break
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [hasNext, hasPrev, onNext, onPrev, toggleFullscreen, handleRetry])
+  }, [hasNext, hasPrev, onNext, onPrev, toggleFullscreen, playing])
 
-  if (!epNumber) {
+  if (!episodeId) {
     return (
       <div className="player" ref={containerRef}>
         <div className="player-message">
@@ -231,8 +214,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
       <div className="player" ref={containerRef}>
         <div className="player-error">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M15 9l-6 6m0-6l6 6"/>
+            <circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6m0-6l6 6"/>
           </svg>
           <h3>Playback Error</h3>
           <p>{error.message}</p>
@@ -240,46 +222,8 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           
           <div className="error-actions">
             <button className="retry-btn primary" onClick={handleRetry}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M1 4v6h6M23 20v-6h-6"/>
-                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
-              </svg>
-              Retry All
+              Try {currentAudio === 'sub' ? 'DUB' : 'SUB'}
             </button>
-          </div>
-
-          <div className="manual-options">
-            <div className="option-group">
-              <span>Try Server:</span>
-              <div className="option-btns">
-                {SERVERS.map((srv, idx) => (
-                  <button 
-                    key={srv}
-                    className={`option-btn ${currentServer === idx ? 'active' : ''}`}
-                    onClick={() => handleForceServer(idx)}
-                  >
-                    {idx + 1}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="option-group">
-              <span>Audio:</span>
-              <div className="option-btns">
-                <button 
-                  className={`option-btn ${currentAudio === 'sub' ? 'active' : ''}`}
-                  onClick={() => handleForceAudio('sub')}
-                >
-                  SUB
-                </button>
-                <button 
-                  className={`option-btn ${currentAudio === 'dub' ? 'active' : ''}`}
-                  onClick={() => handleForceAudio('dub')}
-                >
-                  DUB
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -287,32 +231,80 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   }
 
   return (
-    <div ref={containerRef} className={`player ${fullscreen ? 'fullscreen' : ''}`}>
+    <div ref={containerRef} className={`player ${fullscreen ? 'fullscreen' : ''}`} onClick={togglePlay}>
       {loading && (
         <div className="player-loader">
           <div className="spinner"></div>
-          <p>Loading player...</p>
-          {retryCount > 0 && (
-            <span className="retry-info">
-              Trying {currentAudio.toUpperCase()} on server {currentServer + 1}...
-            </span>
-          )}
+          <p>Loading...</p>
         </div>
       )}
 
-      <iframe
-        ref={iframeRef}
-        key={`${epNumber}-${currentAudio}-${currentServer}-${iframeKey}`}
-        src={embedUrl}
-        className="player-iframe"
-        allowFullScreen
-        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-        onLoad={handleIframeLoad}
-        onError={handleIframeError}
+      <video
+        ref={videoRef}
+        className="player-video"
+        onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
+        onLoadedMetadata={() => setDuration(videoRef.current?.duration || 0)}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => hasNext && onNext?.()}
+        playsInline
       />
 
-      <div className={`overlay-info ${showOverlay ? 'visible' : ''}`}>
-        {currentAudio.toUpperCase()} • Server {currentServer + 1}
+      <div className={`player-controls ${showControls ? 'visible' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className="progress-bar" onClick={handleSeek}>
+          <div className="progress-fill" style={{ width: `${(currentTime / duration) * 100 || 0}%` }} />
+        </div>
+        
+        <div className="controls-row">
+          <div className="controls-left">
+            <button className="ctrl-btn" onClick={togglePlay}>
+              {playing ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              )}
+            </button>
+            
+            {hasPrev && (
+              <button className="ctrl-btn" onClick={onPrev}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+              </button>
+            )}
+            
+            {hasNext && (
+              <button className="ctrl-btn" onClick={onNext}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 18h2V6h-2zM6 18l8.5-6L6 6z"/></svg>
+              </button>
+            )}
+
+            <div className="volume-control">
+              <button className="ctrl-btn" onClick={toggleMute}>
+                {muted || volume === 0 ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9zM12 4L9.91 6.09 12 8.18z"/></svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                )}
+              </button>
+              <input type="range" min="0" max="1" step="0.1" value={muted ? 0 : volume} onChange={handleVolumeChange} className="volume-slider" />
+            </div>
+
+            <span className="time-display">{formatTime(currentTime)} / {formatTime(duration)}</span>
+          </div>
+
+          <div className="controls-right">
+            <div className="audio-toggle">
+              <button className={`audio-btn ${currentAudio === 'sub' ? 'active' : ''}`} onClick={() => switchAudio('sub')}>SUB</button>
+              <button className={`audio-btn ${currentAudio === 'dub' ? 'active' : ''}`} onClick={() => switchAudio('dub')}>DUB</button>
+            </div>
+            <button className="ctrl-btn" onClick={toggleFullscreen}>
+              {fullscreen ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16h3v3h2v-5H5zm3-8H5v2h5V5H8zm6 11h2v-3h3v-2h-5zm2-11V5h-2v5h5V8z"/></svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7zm-2-4h2V7h3V5H5zm12 7h-3v2h5v-5h-2zM14 5v2h3v3h2V5z"/></svg>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
