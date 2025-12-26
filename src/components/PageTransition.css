@@ -1,0 +1,108 @@
+/* Page Transition Animations */
+.page-content {
+  min-height: 100vh;
+}
+
+/* Page Loader with Cozify branding */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: rgba(22, 21, 29, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: loaderIn 0.3s ease-out;
+}
+
+.page-loader.exit {
+  animation: loaderOut 0.4s ease-out forwards;
+}
+
+@keyframes loaderIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loaderOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Cozify Logo */
+.loader-logo {
+  display: flex;
+  gap: 2px;
+}
+
+.loader-logo span {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffbade;
+  animation: letterPulse 0.8s ease-in-out infinite alternate;
+  text-shadow: 0 0 20px rgba(255, 186, 222, 0.6);
+}
+
+@keyframes letterPulse {
+  0% {
+    transform: translateY(0);
+    text-shadow: 0 0 10px rgba(255, 186, 222, 0.4);
+  }
+  100% {
+    transform: translateY(-4px);
+    text-shadow: 0 0 25px rgba(255, 186, 222, 0.8);
+  }
+}
+
+/* Spinner */
+.loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 186, 222, 0.2);
+  border-top-color: #ffbade;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Smooth content reveal for staggered elements */
+.page-transition.enter .anime-card,
+.page-transition.enter .browse-card,
+.page-transition.enter .schedule-card,
+.page-transition.enter .trending-item,
+.page-transition.enter .top-item {
+  animation: staggerReveal 0.5s ease-out backwards;
+}
+
+.page-transition.enter .anime-card:nth-child(1) { animation-delay: 0.05s; }
+.page-transition.enter .anime-card:nth-child(2) { animation-delay: 0.1s; }
+.page-transition.enter .anime-card:nth-child(3) { animation-delay: 0.15s; }
+.page-transition.enter .anime-card:nth-child(4) { animation-delay: 0.2s; }
+.page-transition.enter .anime-card:nth-child(5) { animation-delay: 0.25s; }
+.page-transition.enter .anime-card:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes staggerReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

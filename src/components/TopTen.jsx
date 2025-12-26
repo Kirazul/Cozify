@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getHighQualityImage } from '../utils/imageUtils'
 import './TopTen.css'
 
 export default function TopTen({ items, title = "Top 10" }) {
@@ -38,7 +39,7 @@ export default function TopTen({ items, title = "Top 10" }) {
             <div className={`rank-wrapper rank-${index + 1}`}>
               <span className="rank">{String(index + 1).padStart(2, '0')}</span>
             </div>
-            <img src={anime.image} alt={anime.title} className="top-ten-img" />
+            <img src={getHighQualityImage(anime.image)} alt={anime.title} className="top-ten-img" />
             <div className="top-ten-info">
               <h4>{anime.title}</h4>
               <div className="top-ten-badges">

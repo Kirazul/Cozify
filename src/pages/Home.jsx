@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
+import { getHighQualityImage } from '../utils/imageUtils'
 import './Home.css'
 
 export default function Home() {
@@ -49,7 +50,7 @@ export default function Home() {
             <div 
               key={item.id}
               className={`hero-slide ${i === current ? 'active' : ''}`}
-              style={{ backgroundImage: `url(${item.image})` }}
+              style={{ backgroundImage: `url(${getHighQualityImage(item.image)})` }}
             />
           ))}
         </div>
@@ -113,7 +114,7 @@ export default function Home() {
               <Link key={anime.id} to={`/anime/${anime.id}`} className="trending-item">
                 <span className="trending-rank">{String(i + 1).padStart(2, '0')}</span>
                 <div className="trending-poster">
-                  <img src={anime.image} alt={anime.title} loading="lazy" />
+                  <img src={getHighQualityImage(anime.image)} alt={anime.title} loading="lazy" />
                   <div className="trending-hover">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M8 5v14l11-7z"/>
@@ -141,7 +142,7 @@ export default function Home() {
               recent.slice(0, 22).map(anime => (
                 <Link key={anime.id} to={`/anime/${anime.id}`} className="anime-card">
                   <div className="card-poster">
-                    <img src={anime.image} alt={anime.title} loading="lazy" />
+                    <img src={getHighQualityImage(anime.image)} alt={anime.title} loading="lazy" />
                     <div className="card-overlay">
                       <svg viewBox="0 0 24 24" fill="currentColor">
                         <path d="M8 5v14l11-7z"/>
@@ -180,7 +181,7 @@ export default function Home() {
                 {topAiring.slice(0, 16).map(anime => (
                   <Link key={anime.id} to={`/anime/${anime.id}`} className="anime-card">
                     <div className="card-poster">
-                      <img src={anime.image} alt={anime.title} loading="lazy" />
+                      <img src={getHighQualityImage(anime.image)} alt={anime.title} loading="lazy" />
                       <div className="card-overlay">
                         <svg viewBox="0 0 24 24" fill="currentColor">
                           <path d="M8 5v14l11-7z"/>
@@ -210,7 +211,7 @@ export default function Home() {
                 {topAiring.slice(0, 5).map((anime, i) => (
                   <Link key={anime.id} to={`/anime/${anime.id}`} className="top-item">
                     <span className={`top-rank ${i < 3 ? 'gold' : ''}`}>{i + 1}</span>
-                    <img src={anime.image} alt={anime.title} />
+                    <img src={getHighQualityImage(anime.image)} alt={anime.title} />
                     <div className="top-info">
                       <h4>{anime.title}</h4>
                       <div className="top-meta">

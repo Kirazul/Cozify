@@ -118,6 +118,50 @@ input {
 img {
   max-width: 100%;
   display: block;
+  /* Enhanced image rendering for sharper display */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Anime poster/card images - enhanced quality */
+.card-image img,
+.card-poster img,
+.card-img img,
+.trending-image img,
+.trending-poster img,
+.top-ten-img,
+.anime-poster img,
+.info-poster,
+.schedule-card img,
+.continue-poster img,
+.hero-slide,
+.spotlight-slide,
+.anime-hero {
+  image-rendering: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  /* Subtle sharpening effect */
+  filter: contrast(1.02) saturate(1.05);
+  transition: filter var(--transition-base);
+}
+
+/* Hover enhancement */
+.card-image:hover img,
+.card-poster:hover img,
+.card-img:hover img,
+.trending-image:hover img,
+.trending-poster:hover img {
+  filter: contrast(1.05) saturate(1.1) brightness(1.02);
+}
+
+/* Background images enhancement */
+[style*="background-image"] {
+  image-rendering: auto;
+  background-size: cover;
+  background-position: center;
 }
 
 ul, ol {

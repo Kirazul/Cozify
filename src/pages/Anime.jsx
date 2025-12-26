@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { api } from '../api'
+import { getHighQualityImage } from '../utils/imageUtils'
 import { isEpisodeWatched } from '../services/userService'
 import './Anime.css'
 

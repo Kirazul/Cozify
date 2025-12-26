@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
+import { getHighQualityImage } from '../utils/imageUtils'
 import './Browse.css'
 
 const TYPES = ['All', 'TV', 'Movie', 'OVA', 'ONA', 'Special']

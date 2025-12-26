@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getHighQualityImage } from '../utils/imageUtils'
 import './TrendingCarousel.css'
 
 export default function TrendingCarousel({ items, title = "Trending" }) {
@@ -62,7 +63,7 @@ export default function TrendingCarousel({ items, title = "Trending" }) {
           >
             <div className="trending-rank">{String(index + 1).padStart(2, '0')}</div>
             <div className="trending-image">
-              <img src={anime.image} alt={anime.title} loading="lazy" />
+              <img src={getHighQualityImage(anime.image)} alt={anime.title} loading="lazy" />
               <div className="trending-overlay">
                 <div className="trending-play">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">

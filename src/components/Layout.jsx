@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
+import PageTransition from './PageTransition'
 import './Layout.css'
 
 export default function Layout() {
@@ -8,7 +9,9 @@ export default function Layout() {
     <div className="layout">
       <Header />
       <main className="main-content">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
     </div>

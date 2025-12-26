@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { getHighQualityImage } from '../utils/imageUtils'
 import './AnimeCard.css'
 
 export default function AnimeCard({ anime, index = 0 }) {
   const { id, title, image, type, episodes, subEpisodes, dubEpisodes, duration, description, genres, status, rating, japaneseTitle, aired } = anime
+  const hqImage = getHighQualityImage(image)
   const [showPopup, setShowPopup] = useState(false)
   const [popupSide, setPopupSide] = useState('right')
   const cardRef = useRef(null)
@@ -36,7 +38,7 @@ export default function AnimeCard({ anime, index = 0 }) {
     >
       <Link to={`/anime/${id}`} className="card">
         <div className="card-image">
-          <img src={image} alt={title} loading="lazy" />
+          <img src={hqImage} alt={title} loading="lazy" />
           
           <div className="card-overlay">
             <div className="card-play">
