@@ -11,6 +11,7 @@ export default function Watch() {
   const [anime, setAnime] = useState(null)
   const [loading, setLoading] = useState(true)
   const [audioType, setAudioType] = useState('sub')
+  const [relatedSeasons, setRelatedSeasons] = useState([])
   
   // Watch time tracking
   const watchTimeRef = useRef(0) // Total seconds watched for this episode
@@ -29,6 +30,36 @@ export default function Watch() {
       try {
         const data = await api.getAnimeInfo(animeId)
         setAnime(data)
+        
+        // Search for related seasons using the anime title
+        if (data?.title) {
+          // Extract base title for search (first 2-3 words usually)
+          const searchTitle = data.title
+            .split(':')[0]  // Get part before colon
+            .split(' ')
+            .slice(0, 3)
+            .join(' ')
+          
+          try {
+            const searchResults = await api.search(searchTitle)
+            if (searchResults?.results) {
+              // Filter to find related seasons/movies
+              const baseTitle = data.title.toLowerCase()
+              const related = searchResults.results.filter(item => {
+                if (item.id === animeId) return false
+                const itemTitle = item.title.toLowerCase()
+                // Check if titles share significant words
+                const baseWords = baseTitle.split(/[\s:\-]+/).filter(w => w.length > 3)
+                const itemWords = itemTitle.split(/[\s:\-]+/).filter(w => w.length > 3)
+                const matchCount = baseWords.filter(w => itemWords.includes(w)).length
+                return matchCount >= 2 && (item.type === 'TV' || item.type === 'Movie')
+              })
+              setRelatedSeasons(related.slice(0, 12)) // Limit to 12
+            }
+          } catch (e) {
+            console.log('Could not fetch related seasons')
+          }
+        }
       } catch (err) {
         console.error('Failed to fetch anime:', err)
       } finally {
@@ -181,6 +212,37 @@ export default function Watch() {
                 )}
               </div>
             </div>
+
+            {/* Seasons Section */}
+            {relatedSeasons.length > 0 && (
+              <div className="seasons-section">
+                <div className="seasons-header">
+                  <span>Seasons & Related</span>
+                </div>
+                <div className="seasons-list">
+                  {/* Current Season */}
+                  <div className="season-card active">
+                    <img src={anime?.image} alt={anime?.title} />
+                    <span className="season-label">Current</span>
+                  </div>
+                  {/* Other Seasons */}
+                  {relatedSeasons.map((season) => (
+                    <Link 
+                      key={season.id} 
+                      to={`/anime/${season.id}`}
+                      className="season-card"
+                    >
+                      <img src={season.image} alt={season.title} />
+                      <span className="season-label">
+                        {season.title.length > 20 
+                          ? season.title.slice(0, 18) + '...' 
+                          : season.title}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="watch-right">
