@@ -1,0 +1,131 @@
+.genre-page {
+  display: flex;
+  gap: 30px;
+  padding-top: 30px;
+  min-height: 60vh;
+}
+
+.genre-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.genre-sidebar h3 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.genre-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.genre-link {
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s;
+}
+
+.genre-link:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.genre-link.active {
+  background: var(--accent);
+  color: #111;
+}
+
+.genre-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.genre-header {
+  margin-bottom: 20px;
+}
+
+.genre-header h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 4px;
+  text-transform: capitalize;
+}
+
+.genre-header p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.load-more-btn {
+  padding: 10px 30px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-radius: var(--radius-xl);
+  transition: all 0.2s;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #111;
+}
+
+.load-more-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1100px) {
+  .genre-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .genre-page {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .genre-sidebar {
+    width: 100%;
+  }
+
+  .genre-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .genre-link {
+    padding: 6px 12px;
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+  }
+}
+
+@media (max-width: 768px) {
+  .genre-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+}
+
+@media (max-width: 480px) {
+  .genre-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}

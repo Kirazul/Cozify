@@ -1,0 +1,703 @@
+/* ========================================
+   PROFILE PAGE - World Class Design
+   ======================================== */
+
+.profile-page {
+  min-height: 100vh;
+  padding-top: 56px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background */
+.profile-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.bg-gradient {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-dim) 0%, transparent 50%),
+    var(--bg-primary);
+}
+
+.bg-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 60%);
+}
+
+.profile-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+.profile-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+
+.hero-identity {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.identity-avatar {
+  width: 88px;
+  height: 88px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  flex-shrink: 0;
+}
+
+.identity-info h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.edit-hint {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.identity-info h1:hover .edit-hint {
+  opacity: 1;
+}
+
+.member-since {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.name-edit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.name-edit input {
+  padding: 10px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  width: 200px;
+}
+
+.name-edit input:focus {
+  border-color: var(--accent);
+}
+
+.name-edit button {
+  padding: 10px 18px;
+  background: var(--accent);
+  color: #111;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.name-edit button.cancel {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+/* Hero Stats */
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.stat-block {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+}
+
+/* ========================================
+   NAVIGATION
+   ======================================== */
+.profile-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.profile-nav button {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-nav button:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.profile-nav button.active {
+  background: var(--accent);
+  color: #111;
+}
+
+.nav-badge {
+  background: rgba(0,0,0,0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+/* ========================================
+   OVERVIEW TAB
+   ======================================== */
+.overview-section {
+  margin-bottom: 48px;
+}
+
+.overview-section h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Continue Watching */
+.continue-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.continue-item {
+  display: block;
+  transition: transform 0.2s;
+}
+
+.continue-item:hover {
+  transform: translateY(-4px);
+}
+
+.continue-poster {
+  position: relative;
+  aspect-ratio: 3/4;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.continue-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.continue-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%);
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+}
+
+.continue-overlay span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.continue-info h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.continue-info p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Trophies Preview */
+.trophies-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.trophy-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.trophy-item.locked {
+  opacity: 0.4;
+}
+
+.trophy-item.unlocked {
+  border-color: var(--accent-dim);
+}
+
+.trophy-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trophy-shape {
+  width: 28px;
+  height: 32px;
+  background: var(--text-muted);
+  clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 60%, 80% 80%, 60% 80%, 60% 100%, 40% 100%, 40% 80%, 20% 80%, 0% 60%, 0% 20%);
+  transition: all 0.2s;
+}
+
+.trophy-item.unlocked.tier-bronze .trophy-shape { background: #cd7f32; }
+.trophy-item.unlocked.tier-silver .trophy-shape { background: #c0c0c0; }
+.trophy-item.unlocked.tier-gold .trophy-shape { background: #ffd700; }
+.trophy-item.unlocked.tier-platinum .trophy-shape { background: linear-gradient(135deg, #e5e4e2 0%, #a8d8ea 50%, #e5e4e2 100%); }
+
+.trophy-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.trophy-content h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.trophy-content p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.trophy-progress-bar {
+  height: 3px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.trophy-progress-bar .progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+.view-all-btn {
+  padding: 12px 24px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.view-all-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Journey Stats */
+.journey-stats {
+  display: flex;
+  gap: 40px;
+}
+
+.journey-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.journey-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.journey-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ========================================
+   HISTORY TAB
+   ======================================== */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.empty-action {
+  display: inline-block;
+  padding: 12px 28px;
+  background: var(--accent);
+  color: #111;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.empty-action:hover {
+  filter: brightness(1.1);
+}
+
+/* History Timeline */
+.history-timeline {
+  position: relative;
+}
+
+.history-entry {
+  display: grid;
+  grid-template-columns: 100px 20px 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 0;
+  transition: all 0.2s;
+}
+
+.history-entry:hover {
+  background: var(--bg-secondary);
+  margin: 0 -16px;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.entry-time {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.entry-line {
+  width: 2px;
+  height: 100%;
+  min-height: 60px;
+  background: var(--border);
+  position: relative;
+}
+
+.entry-line::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.entry-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.entry-content img {
+  width: 50px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.entry-info h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.entry-info p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ========================================
+   TROPHIES TAB
+   ======================================== */
+.trophies-header {
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.trophies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.trophy-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  position: relative;
+  transition: all 0.2s;
+}
+
+.trophy-card.locked {
+  opacity: 0.35;
+}
+
+.trophy-card.unlocked {
+  border-color: transparent;
+}
+
+.trophy-card.unlocked.tier-bronze { border-color: rgba(205, 127, 50, 0.4); }
+.trophy-card.unlocked.tier-silver { border-color: rgba(192, 192, 192, 0.4); }
+.trophy-card.unlocked.tier-gold { border-color: rgba(255, 215, 0, 0.4); }
+.trophy-card.unlocked.tier-platinum { border-color: rgba(168, 216, 234, 0.4); }
+
+.trophy-icon-large {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trophy-icon-large .trophy-shape {
+  width: 40px;
+  height: 48px;
+  background: var(--text-muted);
+  clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 60%, 80% 80%, 60% 80%, 60% 100%, 40% 100%, 40% 80%, 20% 80%, 0% 60%, 0% 20%);
+}
+
+.trophy-card.unlocked.tier-bronze .trophy-shape { background: #cd7f32; }
+.trophy-card.unlocked.tier-silver .trophy-shape { background: #c0c0c0; }
+.trophy-card.unlocked.tier-gold .trophy-shape { background: #ffd700; }
+.trophy-card.unlocked.tier-platinum .trophy-shape { background: linear-gradient(135deg, #e5e4e2 0%, #a8d8ea 50%, #e5e4e2 100%); }
+
+.trophy-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.trophy-tier {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.trophy-card.unlocked.tier-bronze .trophy-tier { color: #cd7f32; }
+.trophy-card.unlocked.tier-silver .trophy-tier { color: #c0c0c0; }
+.trophy-card.unlocked.tier-gold .trophy-tier { color: #ffd700; }
+.trophy-card.unlocked.tier-platinum .trophy-tier { color: #a8d8ea; }
+
+.trophy-details h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.trophy-details p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.trophy-progress {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trophy-progress .progress-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.trophy-progress .progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+.trophy-progress .progress-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 36px;
+}
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 900px) {
+  .profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+  }
+  
+  .hero-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-container {
+    padding: 24px 16px 60px;
+  }
+  
+  .hero-identity {
+    gap: 16px;
+  }
+  
+  .identity-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 1.5rem;
+  }
+  
+  .identity-info h1 {
+    font-size: 1.5rem;
+  }
+  
+  .hero-stats {
+    gap: 16px;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .stat-divider {
+    display: none;
+  }
+  
+  .profile-nav {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  
+  .profile-nav button {
+    padding: 10px 18px;
+    white-space: nowrap;
+  }
+  
+  .continue-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .achievements-preview {
+    grid-template-columns: 1fr;
+  }
+  
+  .journey-stats {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .history-entry {
+    grid-template-columns: 70px 16px 1fr;
+    gap: 10px;
+  }
+}

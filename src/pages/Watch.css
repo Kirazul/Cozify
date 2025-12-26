@@ -1,0 +1,409 @@
+/* ========================================
+   WATCH PAGE - Grid Episodes Layout
+   ======================================== */
+
+.watch-page {
+  min-height: 100vh;
+  padding-top: 56px;
+  background: var(--bg-primary);
+}
+
+.watch-main {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+
+.watch-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.watch-breadcrumb a:hover {
+  color: var(--accent);
+}
+
+/* Main Content Layout */
+.watch-content {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.watch-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Player */
+.player-wrapper {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Controls Bar */
+.watch-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+}
+
+.control-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.control-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.control-episode {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.ep-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.ep-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.ep-nav-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #111;
+}
+
+.ep-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.server-select {
+  display: flex;
+  gap: 8px;
+}
+
+.server-select button {
+  padding: 8px 20px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.server-select button:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.server-select button.active {
+  background: var(--accent);
+  color: #111;
+}
+
+/* Episodes Grid Section */
+.episodes-section {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.episodes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.episodes-header span:first-child {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ep-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.episodes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.episodes-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.episodes-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.episodes-grid::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 4px;
+}
+
+.ep-btn {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.ep-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.ep-btn.active {
+  background: var(--accent);
+  color: #111;
+}
+
+.ep-btn.watched {
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  position: relative;
+}
+
+.ep-btn.watched::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 16px 16px 0;
+  border-color: transparent var(--accent) transparent transparent;
+}
+
+.ep-btn.watched::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 2px;
+  width: 6px;
+  height: 3px;
+  border-left: 2px solid #111;
+  border-bottom: 2px solid #111;
+  transform: rotate(-45deg);
+}
+
+.ep-btn.skeleton {
+  background: var(--bg-tertiary);
+}
+
+/* Right Panel - Anime Info */
+.watch-right {
+  position: sticky;
+  top: 76px;
+  height: fit-content;
+  align-self: start;
+}
+
+.watch-info {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.info-poster {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.info-content h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.info-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.info-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 0.8rem;
+  background: rgba(251, 191, 36, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.info-rating svg {
+  fill: #fbbf24;
+}
+
+.info-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.info-type {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.info-desc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.info-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: gap 0.2s;
+}
+
+.info-link:hover {
+  gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .watch-content {
+    grid-template-columns: 1fr 280px;
+  }
+}
+
+@media (max-width: 900px) {
+  .watch-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .watch-right {
+    position: static;
+  }
+  
+  .watch-info {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .info-poster {
+    width: 120px;
+    margin-bottom: 0;
+  }
+  
+  .info-content {
+    flex: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .watch-main {
+    padding: 12px;
+  }
+  
+  .watch-controls {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .control-left {
+    justify-content: space-between;
+  }
+  
+  .server-select {
+    justify-content: center;
+  }
+  
+  .episodes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  }
+  
+  .watch-info {
+    flex-direction: column;
+  }
+  
+  .info-poster {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto 14px;
+  }
+}

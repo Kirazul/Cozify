@@ -1,0 +1,44 @@
+.genre-bar {
+  margin-bottom: 30px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.genre-bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.genre-bar-inner {
+  display: flex;
+  gap: 10px;
+}
+
+.genre-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: var(--radius-xl);
+  white-space: nowrap;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.genre-chip:hover {
+  background: var(--genre-color, var(--accent));
+  color: #111;
+  border-color: var(--genre-color, var(--accent));
+}
+
+.genre-chip.more {
+  background: var(--accent);
+  color: #111;
+}
+
+.genre-chip.more:hover {
+  background: var(--accent-hover);
+}
