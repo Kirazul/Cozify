@@ -2,6 +2,8 @@
 
 A modern anime streaming web application built with React. Cozify provides a seamless viewing experience with an elegant interface, intelligent video player, and comprehensive user tracking features.
 
+![Home Page](screenshots/home.png)
+
 ---
 
 ## Table of Contents
