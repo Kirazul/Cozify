@@ -180,11 +180,6 @@ npm run preview
 
 ## Screenshots
 
-### Home Page
-The landing page features a spotlight carousel, trending anime section, and top 10 rankings.
-
-![Home Page](screenshots/home.png)
-
 ### Browse Page
 Search and filter anime by genre, with grid layout display.
 
