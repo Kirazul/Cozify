@@ -37,20 +37,32 @@
 
 .footer-brand {
   max-width: 340px;
+  text-align: center;
 }
 
 .footer-logo {
-  display: inline-block;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--accent);
-  letter-spacing: -0.03em;
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 auto 20px;
   transition: opacity var(--transition-base);
 }
 
 .footer-logo:hover {
   opacity: 0.8;
+}
+
+.footer-logo-img {
+  height: 80px;
+  width: auto;
+}
+
+.footer-logo-text {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.02em;
 }
 
 .footer-tagline {
@@ -59,10 +71,12 @@
   line-height: 1.7;
   margin-bottom: 28px;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  text-align: center;
 }
 
 .footer-stats {
   display: flex;
+  justify-content: center;
   gap: 32px;
 }
 

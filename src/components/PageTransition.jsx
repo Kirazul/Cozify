@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
+import logoImg from '/LOGO.png'
 import './PageTransition.css'
 
 export default function PageTransition({ children }) {
@@ -51,14 +52,7 @@ export default function PageTransition({ children }) {
     <>
       {showLoader && (
         <div className={`page-loader ${loaderExiting ? 'exit' : ''}`}>
-          <div className="loader-logo">
-            {'Cozify'.split('').map((letter, i) => (
-              <span key={i} style={{ animationDelay: `${i * 0.05}s` }}>
-                {letter}
-              </span>
-            ))}
-          </div>
-          <div className="loader-spinner"></div>
+          <img src={logoImg} alt="Cozify" className="loader-logo-img" />
         </div>
       )}
       <div className="page-content">

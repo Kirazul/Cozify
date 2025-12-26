@@ -1,109 +1,92 @@
 import { useState } from 'react'
-import { setUserName, markVisited } from '../services/userService'
+import { markVisited, setUserName } from '../services/userService'
+import joinImg from '/join.png'
+import logoImg from '/LOGO.png'
 import './WelcomeModal.css'
 
 export default function WelcomeModal({ onClose }) {
-  const [name, setName] = useState('')
   const [step, setStep] = useState(1)
+  const [name, setName] = useState('')
+  const [transitioning, setTransitioning] = useState(false)
 
-  const handleSave = () => {
+  const handleNameSubmit = () => {
     if (name.trim()) {
       setUserName(name.trim())
     }
     markVisited()
-    setStep(2)
+    
+    // Start transition animation
+    setTransitioning(true)
+    setTimeout(() => {
+      setStep(2)
+      setTransitioning(false)
+    }, 500)
   }
 
-  const handleSkip = () => {
+  const handleClose = () => {
     markVisited()
-    setStep(2)
-  }
-
-  const handleFinish = () => {
     onClose()
   }
 
+  const handleWatchNow = () => {
+    markVisited()
+    onClose()
+    window.location.hash = '#/browse'
+  }
+
+  // Step 1: Name input
+  if (step === 1) {
+    return (
+      <div className="welcome-overlay">
+        <div className={`welcome-name-modal ${transitioning ? 'exit' : ''}`}>
+          <button className="welcome-close" onClick={handleClose}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+          
+          <div className="name-modal-content">
+            <img src={logoImg} alt="Cozify" className="welcome-logo" />
+            <p>What should we call you?</p>
+            
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={20}
+              autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleNameSubmit()}
+            />
+            
+            <button className="name-submit-btn" onClick={handleNameSubmit}>
+              {name.trim() ? 'Continue' : 'Skip'}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Step 2: Image popup
   return (
-    <div className="welcome-overlay">
-      <div className="welcome-modal">
-        <button className="welcome-close" onClick={handleFinish}>
-          <span></span>
-          <span></span>
+    <div className="welcome-overlay" onClick={handleClose}>
+      <div className="welcome-modal-image" onClick={(e) => e.stopPropagation()}>
+        <button className="welcome-close" onClick={handleClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
         </button>
-
-        {step === 1 && (
-          <div className="welcome-content">
-            <div className="welcome-visual">
-              <div className="visual-circle"></div>
-              <div className="visual-ring"></div>
-              <div className="visual-ring delay"></div>
-            </div>
-
-            <h1>Welcome to Cozify</h1>
-            <p className="welcome-subtitle">
-              Your personal anime sanctuary. Everything you watch is saved locally on your device.
-            </p>
-
-            <div className="welcome-form">
-              <label>What should we call you?</label>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={20}
-                autoFocus
-              />
-              <span className="form-hint">Stored only on this device. No accounts, no tracking.</span>
-            </div>
-
-            <div className="welcome-actions">
-              <button className="btn-primary" onClick={handleSave}>
-                {name.trim() ? 'Continue' : 'Continue as Guest'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="welcome-content">
-            <div className="welcome-visual">
-              <div className="visual-check">
-                <span></span>
-              </div>
-            </div>
-
-            <h1>{name.trim() ? `Welcome, ${name}` : 'Welcome'}</h1>
-            <p className="welcome-subtitle">
-              Your journey begins now. Track your progress, unlock achievements, and discover your watching patterns.
-            </p>
-
-            <div className="welcome-features">
-              <div className="feature-item">
-                <span className="feature-dot"></span>
-                <span>Watch history saved automatically</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-dot"></span>
-                <span>Continue where you left off</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-dot"></span>
-                <span>Unlock achievements as you watch</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-dot"></span>
-                <span>View your stats anytime</span>
-              </div>
-            </div>
-
-            <div className="welcome-actions">
-              <button className="btn-primary" onClick={handleFinish}>
-                Start Watching
-              </button>
-            </div>
-          </div>
-        )}
+        <img src={joinImg} alt="Welcome to Cozify" />
+        <button className="welcome-watch-btn" onClick={handleWatchNow}>
+          Watch Now
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
       </div>
     </div>
   )

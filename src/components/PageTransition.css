@@ -41,44 +41,24 @@
   }
 }
 
-/* Cozify Logo */
-.loader-logo {
-  display: flex;
-  gap: 2px;
+/* Cozify Logo Image - spinning animation */
+.loader-logo-img {
+  height: 100px;
+  width: auto;
+  animation: logoSpin 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 186, 222, 0.5));
 }
 
-.loader-logo span {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #ffbade;
-  animation: letterPulse 0.8s ease-in-out infinite alternate;
-  text-shadow: 0 0 20px rgba(255, 186, 222, 0.6);
-}
-
-@keyframes letterPulse {
+@keyframes logoSpin {
   0% {
-    transform: translateY(0);
-    text-shadow: 0 0 10px rgba(255, 186, 222, 0.4);
+    transform: rotateY(0deg);
   }
   100% {
-    transform: translateY(-4px);
-    text-shadow: 0 0 25px rgba(255, 186, 222, 0.8);
+    transform: rotateY(360deg);
   }
 }
 
-/* Spinner */
-.loader-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 186, 222, 0.2);
-  border-top-color: #ffbade;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+/* Spinner - removed */
 
 /* Smooth content reveal for staggered elements */
 .page-transition.enter .anime-card,

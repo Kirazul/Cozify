@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { api } from '../api'
 import { getUser } from '../services/userService'
+import logoImg from '/LOGO.png'
 import './Header.css'
 
 export default function Header() {
@@ -79,7 +80,9 @@ export default function Header() {
             </svg>
           </button>
 
-          <Link to="/" className="logo">cozify</Link>
+          <Link to="/" className="logo">
+            <img src={logoImg} alt="Cozify" className="logo-img" />
+          </Link>
 
           <nav className={`nav ${mobileMenuOpen ? 'open' : ''}`}>
             <Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link>

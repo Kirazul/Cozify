@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import logoImg from '/LOGO.png'
 import './Footer.css'
 
 export default function Footer() {
@@ -8,7 +9,10 @@ export default function Footer() {
       <div className="container">
         <div className="footer-main">
           <div className="footer-brand">
-            <Link to="/" className="footer-logo">cozify</Link>
+            <Link to="/" className="footer-logo">
+              <img src={logoImg} alt="Cozify" className="footer-logo-img" />
+              <span className="footer-logo-text">Cozify</span>
+            </Link>
             <p className="footer-tagline">
               Your cozy place to watch anime online. Stream thousands of anime series and movies in HD quality.
             </p>
