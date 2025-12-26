@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import Anime from './pages/Anime'
@@ -21,7 +21,7 @@ export default function App() {
   }, [])
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -33,6 +33,6 @@ export default function App() {
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
