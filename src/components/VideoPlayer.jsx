@@ -75,7 +75,10 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             setLoading(false)
-            video.play().catch(() => {})
+            const playPromise = video.play()
+            if (playPromise !== undefined) {
+              playPromise.catch(() => {}) // Ignore autoplay errors
+            }
           })
           
           hls.on(Hls.Events.ERROR, (_, data) => {
@@ -88,7 +91,10 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           video.src = source.url
           video.addEventListener('loadedmetadata', () => {
             setLoading(false)
-            video.play().catch(() => {})
+            const playPromise = video.play()
+            if (playPromise !== undefined) {
+              playPromise.catch(() => {})
+            }
           }, { once: true })
         }
       } catch (err) {
