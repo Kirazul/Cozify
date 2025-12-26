@@ -24,6 +24,12 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   const [fullscreen, setFullscreen] = useState(false)
   const [seeking, setSeeking] = useState(false)
   
+  // Intro/Outro timestamps
+  const [intro, setIntro] = useState(null)
+  const [outro, setOutro] = useState(null)
+  const [showSkipIntro, setShowSkipIntro] = useState(false)
+  const [showSkipOutro, setShowSkipOutro] = useState(false)
+  
   // Settings state
   const [subtitles, setSubtitles] = useState([])
   const [currentSubtitle, setCurrentSubtitle] = useState('off')
@@ -42,6 +48,10 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     setCurrentSubtitle('off')
     setQualities([])
     setCurrentQuality(-1)
+    setIntro(null)
+    setOutro(null)
+    setShowSkipIntro(false)
+    setShowSkipOutro(false)
   }, [episodeId, audioType])
 
   // Cleanup
@@ -72,10 +82,17 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           throw new Error('No sources available')
         }
 
+        // Store intro/outro timestamps
+        if (data.intro && data.intro.end > 0) {
+          setIntro(data.intro)
+        }
+        if (data.outro && data.outro.end > 0) {
+          setOutro(data.outro)
+        }
+
         // Store subtitles
         if (data.subtitles && data.subtitles.length > 0) {
           setSubtitles(data.subtitles)
-          // Auto-select English if available
           const english = data.subtitles.find(s => s.lang.toLowerCase().includes('english'))
           if (english) {
             setCurrentSubtitle(english.url)
@@ -134,18 +151,47 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     loadSource()
   }, [episodeId, audioType])
 
+  // Check if we should show skip buttons
+  useEffect(() => {
+    if (intro && currentTime >= intro.start && currentTime < intro.end) {
+      setShowSkipIntro(true)
+    } else {
+      setShowSkipIntro(false)
+    }
+    
+    if (outro && currentTime >= outro.start && currentTime < outro.end) {
+      setShowSkipOutro(true)
+    } else {
+      setShowSkipOutro(false)
+    }
+  }, [currentTime, intro, outro])
+
+  const skipIntro = () => {
+    if (videoRef.current && intro) {
+      videoRef.current.currentTime = intro.end
+      setShowSkipIntro(false)
+    }
+  }
+
+  const skipOutro = () => {
+    if (hasNext && onNext) {
+      onNext()
+    } else if (videoRef.current && outro) {
+      videoRef.current.currentTime = outro.end
+      setShowSkipOutro(false)
+    }
+  }
+
   // Handle subtitle change
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
     
-    // Remove existing track
     if (trackRef.current && trackRef.current.parentNode) {
       trackRef.current.parentNode.removeChild(trackRef.current)
       trackRef.current = null
     }
     
-    // Disable all existing text tracks
     for (let i = 0; i < video.textTracks.length; i++) {
       video.textTracks[i].mode = 'disabled'
     }
@@ -160,14 +206,12 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
       video.appendChild(track)
       trackRef.current = track
       
-      // Wait for track to load then enable it
       track.addEventListener('load', () => {
         if (video.textTracks.length > 0) {
           video.textTracks[video.textTracks.length - 1].mode = 'showing'
         }
       })
       
-      // Also try to enable immediately
       setTimeout(() => {
         if (video.textTracks.length > 0) {
           video.textTracks[video.textTracks.length - 1].mode = 'showing'
@@ -217,7 +261,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     const percent = (e.clientX - rect.left) / rect.width
     if (videoRef.current && duration) {
       const newTime = percent * duration
-      setCurrentTime(newTime) // Update UI immediately
+      setCurrentTime(newTime)
       setSeeking(true)
       videoRef.current.currentTime = newTime
     }
@@ -252,9 +296,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   const handleRetry = () => {
     setLoading(true)
     setError(null)
-    // Re-trigger load
-    const video = videoRef.current
-    if (video && hlsRef.current) {
+    if (videoRef.current && hlsRef.current) {
       hlsRef.current.destroy()
     }
   }
@@ -280,11 +322,12 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
         case 'arrowleft': if (videoRef.current) videoRef.current.currentTime -= 10; break
         case 'arrowright': if (videoRef.current) videoRef.current.currentTime += 10; break
         case 'escape': setShowSettings(false); break
+        case 's': if (showSkipIntro) skipIntro(); else if (showSkipOutro) skipOutro(); break
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [hasNext, hasPrev, onNext, onPrev, toggleFullscreen, playing])
+  }, [hasNext, hasPrev, onNext, onPrev, toggleFullscreen, playing, showSkipIntro, showSkipOutro])
 
   if (!episodeId) {
     return (
@@ -348,6 +391,22 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
         crossOrigin="anonymous"
       />
 
+      {/* Skip Intro Button */}
+      {showSkipIntro && (
+        <button className="skip-btn skip-intro" onClick={(e) => { e.stopPropagation(); skipIntro(); }}>
+          Skip Intro
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+      )}
+
+      {/* Skip Outro / Next Episode Button */}
+      {showSkipOutro && (
+        <button className="skip-btn skip-outro" onClick={(e) => { e.stopPropagation(); skipOutro(); }}>
+          {hasNext ? 'Next Episode' : 'Skip Outro'}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+      )}
+
       {/* Settings Panel */}
       {showSettings && (
         <div className="settings-panel" onClick={e => e.stopPropagation()}>
@@ -358,7 +417,6 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
             </button>
           </div>
           
-          {/* Subtitles */}
           <div className="settings-section">
             <label>Subtitles</label>
             <select value={currentSubtitle} onChange={e => setCurrentSubtitle(e.target.value)}>
@@ -369,7 +427,6 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
             </select>
           </div>
           
-          {/* Quality */}
           {qualities.length > 0 && (
             <div className="settings-section">
               <label>Quality</label>
@@ -382,7 +439,6 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
             </div>
           )}
           
-          {/* Playback Speed */}
           <div className="settings-section">
             <label>Speed</label>
             <select value={playbackSpeed} onChange={e => setPlaybackSpeed(parseFloat(e.target.value))}>
@@ -401,6 +457,25 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
 
       <div className={`player-controls ${showControls ? 'visible' : ''}`} onClick={e => e.stopPropagation()}>
         <div className="progress-bar" onClick={handleSeek}>
+          {/* Intro/Outro markers on progress bar */}
+          {intro && duration > 0 && (
+            <div 
+              className="progress-marker intro-marker" 
+              style={{ 
+                left: `${(intro.start / duration) * 100}%`,
+                width: `${((intro.end - intro.start) / duration) * 100}%`
+              }} 
+            />
+          )}
+          {outro && duration > 0 && (
+            <div 
+              className="progress-marker outro-marker" 
+              style={{ 
+                left: `${(outro.start / duration) * 100}%`,
+                width: `${((outro.end - outro.start) / duration) * 100}%`
+              }} 
+            />
+          )}
           <div className="progress-fill" style={{ width: `${(currentTime / duration) * 100 || 0}%` }} />
         </div>
         
@@ -441,12 +516,10 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           </div>
 
           <div className="controls-right">
-            {/* Subtitle indicator */}
             {currentSubtitle !== 'off' && (
               <span className="subtitle-indicator">CC</span>
             )}
             
-            {/* Settings button */}
             <button className="ctrl-btn" onClick={() => setShowSettings(!showSettings)} title="Settings">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
             </button>
