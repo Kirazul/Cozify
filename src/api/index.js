@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+const BASE_URL = 'https://yumaapi.vercel.app';
 
 const cache = new Map();
 

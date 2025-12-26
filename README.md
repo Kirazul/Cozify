@@ -6,6 +6,12 @@ A modern anime streaming web application built with React. Cozify provides a sea
 
 ---
 
+## Demo
+
+Live Demo: [https://kirazul.github.io/Cozify/](https://kirazul.github.io/Cozify/)
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
