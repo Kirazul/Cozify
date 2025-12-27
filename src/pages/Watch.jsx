@@ -35,31 +35,61 @@ export default function Watch() {
         
         // Search for related seasons using the anime title
         if (data?.title) {
-          // Extract base title for search (first 2-3 words usually)
-          const searchTitle = data.title
-            .split(':')[0]  // Get part before colon
-            .split(' ')
-            .slice(0, 3)
-            .join(' ')
-          
           try {
+            // Try multiple search strategies
+            const baseTitle = data.title.toLowerCase()
+            
+            // Strategy 1: Search with first part before colon/dash
+            let searchTitle = data.title.split(/[:\-–]/)[0].trim()
+            
+            // Strategy 2: If title is short, use full title
+            if (searchTitle.length < 5) {
+              searchTitle = data.title.split(' ').slice(0, 4).join(' ')
+            }
+            
+            // Strategy 3: Remove common suffixes like "Season X", "Part X", "2nd Season", etc.
+            searchTitle = searchTitle
+              .replace(/\s*(season|part|cour)\s*\d*/gi, '')
+              .replace(/\s*(1st|2nd|3rd|\d+th)\s*/gi, '')
+              .replace(/\s*(I{1,3}|IV|V|VI{0,3})$/gi, '') // Roman numerals
+              .trim()
+            
+            if (searchTitle.length < 3) {
+              searchTitle = data.title.split(' ').slice(0, 3).join(' ')
+            }
+            
             const searchResults = await api.search(searchTitle)
             if (searchResults?.results) {
               // Filter to find related seasons/movies
-              const baseTitle = data.title.toLowerCase()
               const related = searchResults.results.filter(item => {
                 if (item.id === animeId) return false
+                
                 const itemTitle = item.title.toLowerCase()
-                // Check if titles share significant words
-                const baseWords = baseTitle.split(/[\s:\-]+/).filter(w => w.length > 3)
-                const itemWords = itemTitle.split(/[\s:\-]+/).filter(w => w.length > 3)
-                const matchCount = baseWords.filter(w => itemWords.includes(w)).length
-                return matchCount >= 2 && (item.type === 'TV' || item.type === 'Movie')
+                
+                // Get significant words (length > 2)
+                const baseWords = baseTitle.split(/[\s:\-–]+/).filter(w => w.length > 2)
+                const itemWords = itemTitle.split(/[\s:\-–]+/).filter(w => w.length > 2)
+                
+                // Count matching words
+                const matchCount = baseWords.filter(w => 
+                  itemWords.some(iw => iw.includes(w) || w.includes(iw))
+                ).length
+                
+                // More lenient matching - at least 1 significant word match
+                // or if titles share the first word (often the main title)
+                const firstWordMatch = baseWords[0] && itemWords[0] && 
+                  (baseWords[0] === itemWords[0] || 
+                   baseWords[0].includes(itemWords[0]) || 
+                   itemWords[0].includes(baseWords[0]))
+                
+                return (matchCount >= 1 || firstWordMatch) && 
+                       (item.type === 'TV' || item.type === 'Movie' || item.type === 'OVA' || item.type === 'Special')
               })
-              setRelatedSeasons(related.slice(0, 12)) // Limit to 12
+              
+              setRelatedSeasons(related.slice(0, 12))
             }
           } catch (e) {
-            console.log('Could not fetch related seasons')
+            console.log('Could not fetch related seasons:', e)
           }
         }
       } catch (err) {
