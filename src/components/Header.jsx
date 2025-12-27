@@ -15,7 +15,7 @@ export default function Header() {
   const location = useLocation()
   const searchRef = useRef(null)
   
-  const isHome = location.pathname === '/'
+  const isHome = location.pathname === '/home' || location.pathname === '/'
   const user = getUser()
 
   useEffect(() => {

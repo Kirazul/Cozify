@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import { useLoading } from '../contexts/LoadingContext'
 import VideoPlayer from '../components/VideoPlayer'
 import { addToHistory, markEpisodeCompleted, isEpisodeWatched, addWatchTime } from '../services/userService'
 import './Watch.css'
@@ -8,6 +9,7 @@ import './Watch.css'
 export default function Watch() {
   const { animeId, episodeId } = useParams()
   const navigate = useNavigate()
+  const { setPageLoaded } = useLoading()
   const [anime, setAnime] = useState(null)
   const [loading, setLoading] = useState(true)
   const [audioType, setAudioType] = useState('sub')
@@ -64,9 +66,11 @@ export default function Watch() {
         console.error('Failed to fetch anime:', err)
       } finally {
         setLoading(false)
+        setPageLoaded(true)
       }
     }
     fetchAnime()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animeId])
 
   // Track watch history (immediately add to history for continue watching)

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
+import { useLoading } from '../contexts/LoadingContext'
 import './Schedule.css'
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -46,6 +47,7 @@ function Countdown({ targetTime }) {
 }
 
 export default function Schedule() {
+  const { setPageLoaded } = useLoading()
   const [schedule, setSchedule] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -92,9 +94,11 @@ export default function Schedule() {
         setSchedule([])
       } finally {
         setLoading(false)
+        setPageLoaded(true)
       }
     }
     fetchSchedule()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate])
 
   return (

@@ -1,6 +1,23 @@
 /* Page Transition Animations */
 .page-content {
   min-height: 100vh;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.page-content.visible {
+  visibility: visible;
+  opacity: 1;
+  animation: contentFadeIn 0.4s ease forwards;
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Page Loader with Cozify branding */
@@ -13,10 +30,8 @@
   align-items: center;
   justify-content: center;
   gap: 24px;
-  background: rgba(22, 21, 29, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  animation: loaderIn 0.3s ease-out;
+  background: var(--bg-primary);
+  animation: loaderIn 0.2s ease-out;
 }
 
 .page-loader.exit {
@@ -41,20 +56,78 @@
   }
 }
 
-/* Cozify Logo Image - spinning animation */
+/* Cozify Logo Image - single spin animation */
 .loader-logo-img {
   height: 100px;
   width: auto;
-  animation: logoSpin 1s ease-in-out infinite;
+  animation: logoSpin 0.6s ease-in-out forwards;
   filter: drop-shadow(0 0 20px rgba(255, 186, 222, 0.5));
 }
 
 @keyframes logoSpin {
   0% {
-    transform: rotateY(0deg);
+    transform: rotateY(0deg) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
   }
   100% {
-    transform: rotateY(360deg);
+    transform: rotateY(360deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Loading dots animation */
+.loader-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  opacity: 0;
+  animation: dotsAppear 0.3s ease forwards 0.6s;
+}
+
+@keyframes dotsAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loader-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: dotBounce 1.4s ease-in-out infinite 0.6s;
+  box-shadow: 0 0 10px rgba(255, 186, 222, 0.6);
+  opacity: 0;
+}
+
+.loader-dots .dot:nth-child(1) {
+  animation-delay: 0.6s;
+}
+
+.loader-dots .dot:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+.loader-dots .dot:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes dotBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 

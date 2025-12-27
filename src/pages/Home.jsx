@@ -1,15 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
+import { useLoading } from '../contexts/LoadingContext'
 import { getHighQualityImage } from '../utils/imageUtils'
 import './Home.css'
 
+// Get 4K quality image URL
+function get4KImage(url) {
+  if (!url) return '';
+  // Try to get highest quality from various CDNs
+  return url
+    .replace(/\/small\//, '/large/')
+    .replace(/\/medium\//, '/large/')
+    .replace(/\?.*$/, '') // Remove query params that might limit quality
+    .replace(/w=\d+/, 'w=1920')
+    .replace(/h=\d+/, 'h=1080');
+}
+
 export default function Home() {
+  const { setPageLoaded } = useLoading()
   const [spotlight, setSpotlight] = useState([])
   const [topAiring, setTopAiring] = useState([])
   const [recent, setRecent] = useState([])
   const [current, setCurrent] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [slideDirection, setSlideDirection] = useState('next')
+  const [isAnimating, setIsAnimating] = useState(false)
+  const touchStartX = useRef(0)
+  const touchEndX = useRef(0)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,38 +44,88 @@ export default function Home() {
         console.error('Failed to fetch:', error)
       } finally {
         setLoading(false)
+        setPageLoaded(true)
       }
     }
     fetchData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const maxSlides = Math.min(spotlight.length, 10)
 
   useEffect(() => {
     if (!spotlight.length) return
     const timer = setInterval(() => {
-      setCurrent(c => (c + 1) % Math.min(spotlight.length, 6))
+      goToNext()
     }, 6000)
     return () => clearInterval(timer)
-  }, [spotlight])
+  }, [spotlight, current])
+
+  const goToNext = () => {
+    if (isAnimating) return
+    setIsAnimating(true)
+    setSlideDirection('next')
+    setCurrent(c => (c + 1) % maxSlides)
+    setTimeout(() => setIsAnimating(false), 600)
+  }
+
+  const goToPrev = () => {
+    if (isAnimating) return
+    setIsAnimating(true)
+    setSlideDirection('prev')
+    setCurrent(c => c === 0 ? maxSlides - 1 : c - 1)
+    setTimeout(() => setIsAnimating(false), 600)
+  }
+
+  const goToSlide = (index) => {
+    if (isAnimating || index === current) return
+    setIsAnimating(true)
+    setSlideDirection(index > current ? 'next' : 'prev')
+    setCurrent(index)
+    setTimeout(() => setIsAnimating(false), 600)
+  }
+
+  // Touch handlers for swipe
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) goToNext()
+      else goToPrev()
+    }
+  }
 
   const hero = spotlight[current]
 
   return (
     <div className="home">
       {/* Hero Section with integrated header space */}
-      <section className="hero">
+      <section 
+        className="hero"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <div className="hero-slides">
-          {spotlight.slice(0, 6).map((item, i) => (
+          {spotlight.slice(0, 10).map((item, i) => (
             <div 
               key={item.id}
-              className={`hero-slide ${i === current ? 'active' : ''}`}
-              style={{ backgroundImage: `url(${getHighQualityImage(item.image)})` }}
+              className={`hero-slide ${i === current ? 'active' : ''} ${slideDirection}`}
+              style={{ backgroundImage: `url(${get4KImage(item.image)})` }}
             />
           ))}
         </div>
         <div className="hero-overlay" />
         
         {hero && (
-          <div className="hero-content">
+          <div className={`hero-content ${isAnimating ? 'animating' : ''}`}>
             <h1 className="hero-title">{hero.title}</h1>
             <div className="hero-meta">
               {hero.type && <span>{hero.type}</span>}
@@ -82,21 +150,21 @@ export default function Home() {
         )}
 
         <div className="hero-dots">
-          {spotlight.slice(0, 6).map((_, i) => (
+          {spotlight.slice(0, 10).map((_, i) => (
             <button 
               key={i} 
               className={`dot ${i === current ? 'active' : ''}`}
-              onClick={() => setCurrent(i)}
+              onClick={() => goToSlide(i)}
             />
           ))}
         </div>
 
-        <button className="hero-arrow left" onClick={() => setCurrent(c => c === 0 ? 5 : c - 1)}>
+        <button className="hero-arrow left" onClick={goToPrev}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="m15 18-6-6 6-6"/>
           </svg>
         </button>
-        <button className="hero-arrow right" onClick={() => setCurrent(c => (c + 1) % 6)}>
+        <button className="hero-arrow right" onClick={goToNext}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="m9 18 6-6-6-6"/>
           </svg>
@@ -207,7 +275,7 @@ export default function Home() {
 
             <aside className="split-sidebar">
               <div className="top-list">
-                <h3 className="top-list-title">Top 10 This Week</h3>
+                <h3 className="top-list-title">Top 5 This Week</h3>
                 {topAiring.slice(0, 5).map((anime, i) => (
                   <Link key={anime.id} to={`/anime/${anime.id}`} className="top-item">
                     <span className={`top-rank ${i < 3 ? 'gold' : ''}`}>{i + 1}</span>

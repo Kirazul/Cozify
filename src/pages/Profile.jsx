@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useLoading } from '../contexts/LoadingContext'
 import { 
   getUser, 
   getStats, 
@@ -12,6 +13,7 @@ import {
 import './Profile.css'
 
 export default function Profile() {
+  const { setPageLoaded } = useLoading()
   const [user, setUser] = useState(null)
   const [stats, setStats] = useState(null)
   const [history, setHistory] = useState([])
@@ -27,6 +29,8 @@ export default function Profile() {
     setHistory(getWatchHistory())
     setContinueWatching(getContinueWatching())
     setTrophies(getAllTrophies())
+    setPageLoaded(true)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSaveName = () => {

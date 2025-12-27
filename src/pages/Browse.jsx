@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
+import { useLoading } from '../contexts/LoadingContext'
 import { getHighQualityImage } from '../utils/imageUtils'
 import './Browse.css'
 
 const TYPES = ['All', 'TV', 'Movie', 'OVA', 'ONA', 'Special']
 
 export default function Browse() {
+  const { setPageLoaded } = useLoading()
   const [searchParams, setSearchParams] = useSearchParams()
   const [genres, setGenres] = useState([])
   const [results, setResults] = useState([])
@@ -70,6 +72,7 @@ export default function Browse() {
         setResults([])
       } finally {
         setLoading(false)
+        setPageLoaded(true)
       }
     }
     

@@ -1,0 +1,126 @@
+.landing {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  z-index: 10000;
+}
+
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.8s ease;
+}
+
+.landing.loaded .landing-bg {
+  opacity: 1;
+}
+
+.landing.entering .landing-bg {
+  transform: scale(1.15);
+  opacity: 0;
+}
+
+.landing.entering {
+  pointer-events: none;
+}
+
+.landing-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Anime-style Enter Button */
+.enter-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 55px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.enter-btn::before,
+.enter-btn::after {
+  display: none;
+}
+
+.enter-btn:hover {
+  transform: translateY(-2px);
+}
+
+.enter-btn:active {
+  transform: translateY(0);
+}
+
+.enter-text {
+  font-size: 2.4rem;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 12px;
+  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.8);
+  transition: all 0.3s ease;
+}
+
+.enter-btn:hover .enter-text {
+  color: #ffbade;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 186, 222, 0.4);
+}
+
+.enter-subtext {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  font-style: italic;
+  color: #fff;
+  letter-spacing: 2px;
+  margin-top: 14px;
+  text-shadow: 
+    0 2px 10px rgba(0, 0, 0, 1),
+    0 0 20px rgba(0, 0, 0, 0.8);
+  transition: color 0.3s ease;
+}
+
+.enter-btn:hover .enter-subtext {
+  color: #ffbade;
+}
+
+.enter-line {
+  width: 50px;
+  height: 2px;
+  background: #ffbade;
+  margin-top: 18px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 186, 222, 0.5);
+}
+
+.enter-btn:hover .enter-line {
+  width: 90px;
+}
+
+@media (max-width: 768px) {
+  .enter-text {
+    font-size: 2rem;
+    letter-spacing: 10px;
+  }
+  
+  .enter-subtext {
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+  }
+  
+  .enter-btn {
+    padding: 26px 42px;
+  }
+}

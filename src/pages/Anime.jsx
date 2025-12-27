@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import { useLoading } from '../contexts/LoadingContext'
 import { getWatchHistory } from '../services/userService'
 
 export default function Anime() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { setPageLoaded } = useLoading()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -48,10 +50,12 @@ export default function Anime() {
         navigate('/browse', { replace: true })
       } finally {
         setLoading(false)
+        setPageLoaded(true)
       }
     }
     
     fetchAndRedirect()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, navigate])
 
   // Show loading while redirecting

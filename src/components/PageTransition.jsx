@@ -1,61 +1,96 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useLoading } from '../contexts/LoadingContext'
 import logoImg from '/LOGO.png'
 import './PageTransition.css'
 
 export default function PageTransition({ children }) {
   const location = useLocation()
+  const { isPageLoaded, resetLoading } = useLoading()
   const [showLoader, setShowLoader] = useState(true)
   const [loaderExiting, setLoaderExiting] = useState(false)
+  const [contentVisible, setContentVisible] = useState(false)
   const lastPathRef = useRef('')
-  const timer1Ref = useRef(null)
-  const timer2Ref = useRef(null)
+  const timerRef = useRef(null)
+  const fromLandingRef = useRef(false)
 
-  useEffect(() => {
+  // Use layoutEffect to immediately hide content before paint
+  useLayoutEffect(() => {
     const currentPath = location.pathname
     const isInitialLoad = lastPathRef.current === ''
     const isPathChange = lastPathRef.current !== currentPath
     
+    // Check if coming from landing page (first navigation to /home)
+    const isFromLanding = isInitialLoad && currentPath === '/home'
+    fromLandingRef.current = isFromLanding
+    
     if (!isInitialLoad && !isPathChange) return
+    
+    // Skip loader if coming from landing page (it has its own transition)
+    if (isFromLanding) {
+      setShowLoader(false)
+      setContentVisible(true)
+      lastPathRef.current = currentPath
+      return
+    }
+    
+    // Immediately hide content and show loader before any render
+    setContentVisible(false)
+    setShowLoader(true)
+    setLoaderExiting(false)
+    resetLoading()
     
     lastPathRef.current = currentPath
     
-    // Clear any existing timers
-    if (timer1Ref.current) clearTimeout(timer1Ref.current)
-    if (timer2Ref.current) clearTimeout(timer2Ref.current)
+    if (isPathChange && !isInitialLoad) {
+      window.scrollTo(0, 0)
+    }
+  }, [location.pathname, resetLoading])
+
+  // Clear timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
+
+  // Watch for page loaded state
+  useEffect(() => {
+    if (!isPageLoaded || !showLoader) return
     
-    // Show loader
-    setShowLoader(true)
-    setLoaderExiting(false)
+    // Clear any existing timer
+    if (timerRef.current) clearTimeout(timerRef.current)
     
-    // Start exit after delay
-    timer1Ref.current = setTimeout(() => {
-      if (isPathChange && !isInitialLoad) {
-        window.scrollTo(0, 0)
-      }
+    // Minimum display time for the loader (so it doesn't flash)
+    timerRef.current = setTimeout(() => {
       setLoaderExiting(true)
       
-      // Hide completely
-      timer2Ref.current = setTimeout(() => {
+      // Hide loader completely, then show content
+      setTimeout(() => {
         setShowLoader(false)
         setLoaderExiting(false)
+        setContentVisible(true)
       }, 400)
-    }, 600)
+    }, 400)
 
     return () => {
-      if (timer1Ref.current) clearTimeout(timer1Ref.current)
-      if (timer2Ref.current) clearTimeout(timer2Ref.current)
+      if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [location.pathname])
+  }, [isPageLoaded, showLoader])
 
   return (
     <>
       {showLoader && (
         <div className={`page-loader ${loaderExiting ? 'exit' : ''}`}>
           <img src={logoImg} alt="Cozify" className="loader-logo-img" />
+          <div className="loader-dots">
+            <span className="dot"></span>
+            <span className="dot"></span>
+            <span className="dot"></span>
+          </div>
         </div>
       )}
-      <div className="page-content">
+      <div className={`page-content ${contentVisible ? 'visible' : ''}`}>
         {children}
       </div>
     </>
