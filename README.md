@@ -1,5 +1,6 @@
 <p align="center">
   <img src="public/LOGO.png" alt="Cozify Logo" width="150">
+</p>
 A modern anime streaming web application built with React. Cozify provides a seamless viewing experience with an elegant interface, custom HLS video player, and comprehensive user tracking features.
 
 ![Home Page](screenshots/home.png)
