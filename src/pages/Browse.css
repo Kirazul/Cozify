@@ -252,25 +252,28 @@
 
 /* Results Grid */
 .results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: var(--space-4);
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
 /* Browse Card */
 .browse-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
 }
 
 .browse-card .card-img {
   position: relative;
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3;
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--bg-secondary);
-  max-height: 220px;
+  width: 100%;
 }
 
 .browse-card .card-img img {
@@ -485,12 +488,9 @@
   }
   
   .results-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-  
-  .browse-card .card-img {
-    max-height: 160px;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px 10px !important;
   }
   
   .browse-card .card-title {
@@ -527,12 +527,9 @@
   }
   
   .results-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-  
-  .browse-card .card-img {
-    max-height: 140px;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px 8px !important;
   }
   
   .browse-card .card-title {
