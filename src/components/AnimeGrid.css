@@ -35,7 +35,22 @@
 
 @media (max-width: 768px) {
   .anime-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .anime-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .section-header {
+    margin-bottom: 12px;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
   }
 }

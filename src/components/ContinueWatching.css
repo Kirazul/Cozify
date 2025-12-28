@@ -127,9 +127,47 @@
 }
 
 @media (max-width: 768px) {
-  .continue-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .continue-grid { 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 12px; 
+  }
+  
+  .section-title-group h2 {
+    font-size: 1.1rem;
+  }
+  
+  .continue-info h4 {
+    font-size: 0.8rem;
+  }
+  
+  .continue-info span {
+    font-size: 0.7rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .continue-grid { grid-template-columns: repeat(2, 1fr); }
+  .continue-grid { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 10px;
+  }
+  
+  .continue-section {
+    margin-bottom: 32px;
+  }
+  
+  .section-header {
+    margin-bottom: 14px;
+  }
+  
+  .section-title-group h2 {
+    font-size: 1rem;
+  }
+  
+  .continue-info {
+    padding: 8px 2px;
+  }
+  
+  .continue-info h4 {
+    font-size: 0.75rem;
+  }
 }

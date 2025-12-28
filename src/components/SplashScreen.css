@@ -308,4 +308,39 @@
   .loader-bar {
     width: 150px;
   }
+  
+  .logo-tagline {
+    font-size: 0.85rem;
+    letter-spacing: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .glow-1, .glow-2, .glow-3 {
+    width: 150px;
+    height: 150px;
+    filter: blur(60px);
+  }
+  
+  .logo-letter {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+  }
+  
+  .logo-tagline {
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+  }
+  
+  .loader-bar {
+    width: 120px;
+  }
+  
+  .loader-dots {
+    gap: 6px;
+  }
+  
+  .loader-dots span {
+    width: 6px;
+    height: 6px;
+  }
 }

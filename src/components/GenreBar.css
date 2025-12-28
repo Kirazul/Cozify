@@ -42,3 +42,32 @@
 .genre-chip.more:hover {
   background: var(--accent-hover);
 }
+
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .genre-bar {
+    margin-bottom: 24px;
+    padding-bottom: 6px;
+  }
+  
+  .genre-bar-inner {
+    gap: 8px;
+  }
+  
+  .genre-chip {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .genre-bar {
+    margin-bottom: 20px;
+  }
+  
+  .genre-chip {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+}

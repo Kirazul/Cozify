@@ -90,9 +90,57 @@
 }
 
 @media (max-width: 768px) {
-  .search-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .search-page {
+    padding-top: 20px;
+  }
+  
+  .search-header {
+    margin-bottom: 20px;
+  }
+  
+  .search-header h1 {
+    font-size: 1.2rem;
+  }
+  
+  .search-grid { 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 12px; 
+  }
+  
+  .search-empty {
+    padding: 40px 16px;
+  }
+  
+  .search-empty svg {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .search-empty p {
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .search-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .search-page {
+    padding-top: 16px;
+  }
+  
+  .search-header h1 {
+    font-size: 1.1rem;
+  }
+  
+  .results-count {
+    font-size: 0.8rem;
+  }
+  
+  .search-grid { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 10px; 
+  }
+  
+  .load-more-btn {
+    padding: 8px 24px;
+    font-size: 0.85rem;
+  }
 }

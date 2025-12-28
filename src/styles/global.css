@@ -176,6 +176,46 @@ ul, ol {
 
 @media (max-width: 768px) {
   .container { padding: 0 var(--space-4); }
+  
+  html {
+    font-size: 13px;
+  }
+  
+  /* Improve touch targets */
+  button, a, input, select {
+    min-height: 44px;
+  }
+  
+  /* Prevent text size adjustment on orientation change */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container { padding: 0 var(--space-3); }
+  
+  html {
+    font-size: 12px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover effects on touch devices for better performance */
+  .card:hover .card-image img,
+  .trending-item:hover .trending-poster img,
+  .anime-card:hover .card-poster img {
+    transform: none;
+  }
+  
+  /* Show play buttons by default on touch */
+  .card-overlay,
+  .trending-hover,
+  .continue-overlay {
+    opacity: 0.7;
+  }
 }
 
 /* Scrollbar */

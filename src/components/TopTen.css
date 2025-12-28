@@ -147,3 +147,95 @@
   background: var(--accent);
   color: #111;
 }
+
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .top-ten {
+    border-radius: var(--radius-md);
+  }
+  
+  .top-ten-header {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .top-ten-header h3 {
+    font-size: 1rem;
+  }
+  
+  .top-ten-tabs {
+    padding: 2px;
+  }
+  
+  .top-ten-tabs button {
+    padding: 4px 10px;
+    font-size: 0.65rem;
+  }
+  
+  .top-ten-list {
+    padding: 6px;
+  }
+  
+  .top-ten-item {
+    padding: 8px 10px;
+    gap: 10px;
+  }
+  
+  .rank-wrapper {
+    min-width: 24px;
+  }
+  
+  .rank {
+    font-size: 0.9rem;
+  }
+  
+  .rank-1 .rank,
+  .rank-2 .rank,
+  .rank-3 .rank {
+    font-size: 1rem;
+  }
+  
+  .top-ten-img {
+    width: 45px;
+    height: 62px;
+  }
+  
+  .top-ten-info h4 {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+  }
+  
+  .top-ten-badges {
+    gap: 3px;
+  }
+  
+  .top-ten-type {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-ten-header {
+    padding: 12px 14px;
+  }
+  
+  .top-ten-header h3 {
+    font-size: 0.95rem;
+  }
+  
+  .top-ten-item {
+    padding: 6px 8px;
+    gap: 8px;
+  }
+  
+  .top-ten-img {
+    width: 40px;
+    height: 55px;
+  }
+  
+  .top-ten-info h4 {
+    font-size: 0.75rem;
+  }
+}

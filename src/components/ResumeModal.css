@@ -115,7 +115,39 @@
 
 @media (max-width: 480px) {
   .resume-modal {
-    padding: 24px;
+    padding: 24px 20px;
+    width: 95%;
+  }
+  
+  .resume-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+  }
+  
+  .resume-logo {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .resume-modal h3 {
+    font-size: 1.2rem;
+  }
+  
+  .resume-time {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  
+  .resume-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .resume-modal {
+    padding: 20px 16px;
   }
   
   .resume-icon {
@@ -123,12 +155,7 @@
     height: 60px;
   }
   
-  .resume-icon svg {
-    width: 36px;
-    height: 36px;
-  }
-  
   .resume-modal h3 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 }

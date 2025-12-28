@@ -425,38 +425,51 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .schedule-page {
+    padding-bottom: var(--space-8);
+  }
+  
   .schedule-hero {
-    padding: 110px 0 40px;
+    padding: 100px 0 40px;
   }
   
   .schedule-hero .hero-icon {
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
   }
   
   .schedule-hero .hero-icon svg {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
   }
   
   .schedule-hero h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+  }
+  
+  .schedule-hero p {
+    font-size: 0.9rem;
   }
   
   .schedule-hero .hero-stats {
-    gap: var(--space-4);
+    gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
   }
   
   .schedule-hero .stat-num {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+  }
+  
+  .schedule-hero .stat-label {
+    font-size: 0.65rem;
   }
   
   .week-nav {
-    width: calc(100% - var(--space-8));
+    width: calc(100% - var(--space-6));
     overflow-x: auto;
     justify-content: flex-start;
     -webkit-overflow-scrolling: touch;
+    margin: var(--space-4) auto var(--space-6);
   }
   
   .week-nav::-webkit-scrollbar {
@@ -464,23 +477,110 @@
   }
   
   .day-btn {
-    min-width: 55px;
+    min-width: 50px;
     padding: var(--space-2) var(--space-3);
   }
   
+  .day-btn .day-name {
+    font-size: 0.6rem;
+  }
+  
   .day-btn .day-num {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   
   .date-header {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+  }
+  
+  .date-header h2 {
+    font-size: 1rem;
+  }
+  
+  .schedule-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+  }
+  
+  .schedule-card .card-body {
+    padding: var(--space-2);
+  }
+  
+  .schedule-card .card-body h3 {
+    font-size: 0.8rem;
+  }
+  
+  .schedule-card .card-meta {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-hero {
+    padding: 90px 0 32px;
+  }
+  
+  .schedule-hero h1 {
+    font-size: 1.3rem;
+  }
+  
+  .schedule-hero .hero-stats {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .schedule-hero .stat-divider {
+    display: none;
+  }
+  
+  .week-nav {
+    margin: var(--space-3) auto var(--space-5);
+  }
+  
+  .day-btn {
+    min-width: 45px;
+    padding: var(--space-2);
+  }
+  
+  .day-btn .day-num {
+    font-size: 0.95rem;
   }
   
   .schedule-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
+    gap: var(--space-2);
+  }
+  
+  .schedule-card .ep-badge,
+  .schedule-card .countdown {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+  
+  .schedule-card .card-body h3 {
+    font-size: 0.75rem;
+    -webkit-line-clamp: 2;
+  }
+  
+  .empty-state {
+    padding: 40px var(--space-4);
+  }
+  
+  .empty-state svg {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .empty-state h3 {
+    font-size: 0.9rem;
+  }
+  
+  .empty-state p {
+    font-size: 0.8rem;
   }
 }
 

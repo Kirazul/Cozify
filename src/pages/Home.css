@@ -780,13 +780,24 @@
 
 @media (max-width: 768px) {
   .hero {
-    height: 70vh;
-    min-height: 450px;
+    height: 65vh;
+    min-height: 400px;
+    max-height: 550px;
   }
 
   .hero-content {
     padding: 0 var(--space-4);
-    bottom: 20%;
+    bottom: 18%;
+    max-width: 100%;
+  }
+  
+  .hero-title {
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+  }
+  
+  .hero-meta {
+    font-size: 0.8rem;
+    gap: 8px;
   }
 
   .hero-desc {
@@ -796,50 +807,131 @@
   .hero-arrow {
     display: none;
   }
+  
+  .hero-dots {
+    bottom: 80px;
+  }
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .dot.active {
+    width: 24px;
+  }
 
   .section {
-    padding: 30px 0;
+    padding: 24px 0;
+  }
+  
+  .section:first-of-type {
+    margin-top: -50px;
+  }
+  
+  .section-title {
+    font-size: 1.15rem;
   }
 
   .trending-item {
-    width: 120px;
+    width: 110px;
   }
 
   .trending-rank {
-    font-size: 2.5rem;
-    left: -6px;
+    font-size: 2.2rem;
+    left: -5px;
   }
 
   .anime-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px 10px;
   }
 
   .schedule-preview {
     grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
   }
 
   .schedule-day:nth-child(n+5) {
     display: none;
   }
+  
+  .schedule-day {
+    padding: 14px 10px;
+  }
+  
+  .day-name {
+    font-size: 0.75rem;
+  }
+  
+  .day-count {
+    font-size: 1.2rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .hero {
+    height: 55vh;
+    min-height: 350px;
+  }
+  
+  .hero-content {
+    bottom: 15%;
+  }
+
   .hero-title {
-    font-size: 1.6rem;
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+  
+  .hero-badge {
+    font-size: 0.6rem;
+    padding: 3px 10px;
+    margin-bottom: 8px;
+  }
+  
+  .hero-meta {
+    margin-bottom: 12px;
   }
 
   .hero-actions {
     flex-direction: column;
+    gap: 8px;
   }
 
   .btn-primary, .btn-secondary {
     width: 100%;
     justify-content: center;
+    padding: 12px 20px;
+    font-size: 0.85rem;
+  }
+  
+  .trending-item {
+    width: 95px;
+  }
+  
+  .trending-item h3 {
+    font-size: 0.75rem;
   }
 
   .anime-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 12px 8px;
+  }
+  
+  .anime-card h3 {
+    font-size: 0.8rem;
+  }
+  
+  .card-type {
+    font-size: 0.65rem;
+  }
+  
+  .schedule-preview {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .schedule-day:nth-child(n+4) {
+    display: none;
   }
 }

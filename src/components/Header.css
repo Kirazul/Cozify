@@ -325,6 +325,7 @@
     opacity: 0;
     pointer-events: none;
     transition: all 0.2s;
+    z-index: 99;
   }
   
   .nav.open {
@@ -340,29 +341,83 @@
 }
 
 @media (max-width: 640px) {
+  .nav {
+    top: 56px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    height: 56px;
+  }
+  
+  .logo-img {
+    height: 42px;
+  }
+  
+  .header-left {
+    gap: var(--space-3);
+  }
+  
   .search-box input { 
-    width: 180px; 
-    padding: 10px 14px 10px 38px;
-    font-size: 0.85rem;
+    width: 140px; 
+    padding: 8px 12px 8px 34px;
+    font-size: 0.8rem;
+  }
+  
+  .search-icon {
+    left: 10px;
+    width: 16px;
+    height: 16px;
   }
   
   .search-box input:focus {
-    width: 200px;
+    width: 160px;
   }
   
   .search-dropdown {
     position: fixed;
-    top: 72px;
-    left: var(--space-4);
-    right: var(--space-4);
+    top: 64px;
+    left: var(--space-3);
+    right: var(--space-3);
     width: auto;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .search-item {
+    padding: var(--space-3);
   }
   
   .search-item img {
-    width: 50px;
-    height: 68px;
+    width: 45px;
+    height: 62px;
+  }
+  
+  .search-item-title {
+    font-size: 0.85rem;
+  }
+  
+  .profile-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  
+  .header-right {
+    gap: var(--space-2);
   }
   
   .login-btn span { display: none; }
   .login-btn { padding: 8px 12px; }
+}
+
+@media (max-width: 400px) {
+  .search-box input {
+    width: 100px;
+  }
+  
+  .search-box input:focus {
+    width: 130px;
+  }
 }

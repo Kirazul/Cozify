@@ -633,40 +633,62 @@
   .profile-hero {
     flex-direction: column;
     align-items: flex-start;
-    gap: 32px;
+    gap: 24px;
+    padding: 32px 0;
   }
   
   .hero-stats {
     width: 100%;
     justify-content: space-between;
   }
+  
+  .trophies-preview {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
+  .profile-page {
+    padding-top: 56px;
+  }
+  
   .profile-container {
-    padding: 24px 16px 60px;
+    padding: 20px 12px 50px;
+  }
+  
+  .profile-hero {
+    padding: 24px 0;
+    margin-bottom: 24px;
   }
   
   .hero-identity {
-    gap: 16px;
+    gap: 14px;
   }
   
   .identity-avatar {
-    width: 64px;
-    height: 64px;
-    font-size: 1.5rem;
+    width: 56px;
+    height: 56px;
+    font-size: 1.3rem;
   }
   
   .identity-info h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+  }
+  
+  .member-since {
+    font-size: 0.8rem;
   }
   
   .hero-stats {
-    gap: 16px;
+    gap: 12px;
   }
   
   .stat-value {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
   }
   
   .stat-divider {
@@ -676,28 +698,152 @@
   .profile-nav {
     overflow-x: auto;
     padding-bottom: 8px;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  
+  .profile-nav::-webkit-scrollbar {
+    display: none;
   }
   
   .profile-nav button {
-    padding: 10px 18px;
+    padding: 8px 14px;
     white-space: nowrap;
+    font-size: 0.85rem;
+  }
+  
+  .overview-section {
+    margin-bottom: 36px;
+  }
+  
+  .overview-section h2 {
+    font-size: 1rem;
+    margin-bottom: 16px;
   }
   
   .continue-list {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
   
-  .achievements-preview {
+  .continue-info h3 {
+    font-size: 0.85rem;
+  }
+  
+  .continue-info p {
+    font-size: 0.75rem;
+  }
+  
+  .trophies-preview {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .trophy-item {
+    padding: 12px 14px;
+  }
+  
+  .trophy-content h4 {
+    font-size: 0.85rem;
+  }
+  
+  .trophy-content p {
+    font-size: 0.75rem;
   }
   
   .journey-stats {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+  }
+  
+  .journey-value {
+    font-size: 1.1rem;
   }
   
   .history-entry {
-    grid-template-columns: 70px 16px 1fr;
+    grid-template-columns: 60px 14px 1fr;
+    gap: 8px;
+    padding: 12px 0;
+  }
+  
+  .entry-time {
+    font-size: 0.7rem;
+  }
+  
+  .entry-content img {
+    width: 45px;
+    height: 62px;
+  }
+  
+  .entry-info h3 {
+    font-size: 0.85rem;
+  }
+  
+  .entry-info p {
+    font-size: 0.75rem;
+  }
+  
+  .trophies-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .trophy-card {
+    padding: 16px;
+  }
+  
+  .trophy-icon-large {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .trophy-icon-large .trophy-shape {
+    width: 32px;
+    height: 38px;
+  }
+  
+  .trophy-details h3 {
+    font-size: 0.9rem;
+  }
+  
+  .trophy-details p {
+    font-size: 0.8rem;
+  }
+  
+  .name-edit {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .name-edit input {
+    width: 100%;
+  }
+  
+  .name-edit button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .profile-container {
+    padding: 16px 10px 40px;
+  }
+  
+  .identity-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
+  }
+  
+  .identity-info h1 {
+    font-size: 1.15rem;
+  }
+  
+  .continue-list {
     gap: 10px;
+  }
+  
+  .continue-poster {
+    border-radius: 8px;
   }
 }

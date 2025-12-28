@@ -280,3 +280,56 @@
     display: none;
   }
 }
+
+@media (max-width: 768px) {
+  .card-info {
+    padding: var(--space-2) var(--space-1);
+  }
+  
+  .card-title {
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+  }
+  
+  .card-meta {
+    font-size: 0.7rem;
+    gap: var(--space-1);
+  }
+  
+  .card-badges {
+    bottom: var(--space-1);
+    left: var(--space-1);
+    gap: 2px;
+  }
+  
+  .card-rating {
+    top: var(--space-1);
+    right: var(--space-1);
+    padding: 2px 4px;
+    font-size: 0.65rem;
+  }
+  
+  .card-play {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-image {
+    border-radius: var(--radius-md);
+  }
+  
+  .card-title {
+    font-size: 0.75rem;
+  }
+  
+  .card-meta {
+    font-size: 0.65rem;
+  }
+  
+  .card-play {
+    width: 36px;
+    height: 36px;
+  }
+}

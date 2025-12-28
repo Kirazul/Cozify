@@ -161,22 +161,39 @@
 
 @media (max-width: 768px) {
   .trending-card {
-    width: 130px;
+    width: 120px;
   }
 
   .trending-rank {
-    font-size: 2.5rem;
-    left: -6px;
-    bottom: 45px;
+    font-size: 2.2rem;
+    left: -5px;
+    bottom: 42px;
+  }
+  
+  .trending-info h3 {
+    font-size: 0.8rem;
   }
 }
 
 @media (max-width: 480px) {
   .trending-card {
-    width: 110px;
+    width: 100px;
   }
 
   .trending-rank {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    bottom: 38px;
+  }
+  
+  .trending-info {
+    padding: 8px 2px 2px;
+  }
+  
+  .trending-info h3 {
+    font-size: 0.75rem;
+  }
+  
+  .trending-header h2 {
+    font-size: 1.1rem;
   }
 }

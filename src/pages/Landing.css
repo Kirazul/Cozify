@@ -111,16 +111,47 @@
 
 @media (max-width: 768px) {
   .enter-text {
-    font-size: 2rem;
-    letter-spacing: 10px;
+    font-size: 1.8rem;
+    letter-spacing: 8px;
   }
   
   .enter-subtext {
-    font-size: 0.7rem;
-    letter-spacing: 5px;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    margin-top: 10px;
   }
   
   .enter-btn {
-    padding: 26px 42px;
+    padding: 24px 36px;
+  }
+  
+  .enter-line {
+    width: 40px;
+    margin-top: 14px;
+  }
+  
+  .enter-btn:hover .enter-line {
+    width: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .enter-text {
+    font-size: 1.5rem;
+    letter-spacing: 6px;
+  }
+  
+  .enter-subtext {
+    font-size: 1.2rem;
+    margin-top: 8px;
+  }
+  
+  .enter-btn {
+    padding: 20px 28px;
+  }
+  
+  .enter-line {
+    width: 30px;
+    margin-top: 12px;
   }
 }

@@ -395,36 +395,135 @@
 }
 
 @media (max-width: 640px) {
+  .watch-page {
+    padding-top: 56px;
+  }
+  
   .watch-main {
-    padding: 12px;
+    padding: 10px;
+  }
+  
+  .watch-breadcrumb {
+    font-size: 0.75rem;
+    margin-bottom: 10px;
   }
   
   .watch-controls {
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     align-items: stretch;
+    padding: 10px 12px;
   }
   
   .control-left {
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .control-info {
+    gap: 6px;
+  }
+  
+  .control-label {
+    font-size: 0.7rem;
+  }
+  
+  .control-episode {
+    font-size: 0.9rem;
+  }
+  
+  .ep-nav-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
   }
   
   .server-select {
     justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .server-select button {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+  }
+  
+  .episodes-section {
+    padding: 12px;
+  }
+  
+  .episodes-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+  
+  .episodes-header span:first-child {
+    font-size: 0.85rem;
   }
   
   .episodes-grid {
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+    gap: 6px;
+    max-height: 250px;
+  }
+  
+  .ep-btn {
+    font-size: 0.8rem;
+    border-radius: 6px;
   }
   
   .watch-info {
     flex-direction: column;
+    padding: 12px;
   }
   
   .info-poster {
     width: 100%;
-    max-width: 200px;
-    margin: 0 auto 14px;
+    max-width: 160px;
+    margin: 0 auto 12px;
+  }
+  
+  .info-content h1 {
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  .info-meta {
+    justify-content: center;
+  }
+  
+  .info-desc {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 4;
+  }
+  
+  .info-link {
+    display: block;
+    text-align: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .watch-main {
+    padding: 8px;
+  }
+  
+  .episodes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 4px;
+  }
+  
+  .ep-btn {
+    font-size: 0.75rem;
+  }
+  
+  .control-left {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .ep-nav {
+    justify-content: center;
   }
 }
 
@@ -531,11 +630,26 @@
 
 @media (max-width: 640px) {
   .seasons-list {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
   }
   
   .season-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
+    padding: 16px 4px 4px;
+  }
+  
+  .seasons-section {
+    padding: 12px;
+  }
+  
+  .seasons-header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+  
+  .seasons-header span {
+    font-size: 0.85rem;
   }
 }
 
