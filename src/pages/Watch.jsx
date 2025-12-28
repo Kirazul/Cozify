@@ -182,9 +182,12 @@ export default function Watch() {
     console.log('Saving progress:', animeId, episodeId, timestamp)
     saveWatchProgress(animeId, episodeId, timestamp, duration)
   }, [animeId, episodeId])
+  
+  // Theater mode state
+  const [theaterMode, setTheaterMode] = useState(false)
 
   return (
-    <div className="watch-page">
+    <div className={`watch-page ${theaterMode ? 'theater-active' : ''}`}>
       <main className="watch-main">
         <nav className="watch-breadcrumb">
           <Link to="/">Home</Link>
@@ -196,7 +199,7 @@ export default function Watch() {
 
         <div className="watch-content">
           <div className="watch-left">
-            <div className="player-wrapper">
+            <div className={`player-wrapper ${theaterMode ? 'theater' : ''}`}>
               {savedProgress !== null && (
                 <VideoPlayer 
                   key={`${episodeId}-${savedProgress}`}
@@ -210,6 +213,7 @@ export default function Watch() {
                   animeId={animeId}
                   savedTimestamp={savedProgress}
                   onProgressUpdate={handleProgressUpdate}
+                  onTheaterModeChange={setTheaterMode}
                 />
               )}
             </div>
@@ -325,8 +329,7 @@ export default function Watch() {
                     {episodes.length > 0 && <span className="info-badge">{episodes.length} eps</span>}
                     {anime.type && <span className="info-type">{anime.type}</span>}
                   </div>
-                  {anime.description && <p className="info-desc">{anime.description}</p>}
-                  <Link to={`/anime/${animeId}`} className="info-link">View details →</Link>
+                  {anime.description && <p className="info-desc-full">{anime.description}</p>}
                 </div>
               </div>
             )}

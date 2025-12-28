@@ -656,3 +656,69 @@ video::cue {
 .player.fullscreen .sub-size-xlarge::cue {
   font-size: 3rem;
 }
+
+
+/* Toggle Button for Auto-skip */
+.toggle-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toggle-section label {
+  margin-bottom: 0;
+}
+
+.toggle-btn {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  padding: 0;
+}
+
+.toggle-btn.active {
+  background: var(--accent);
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn.active .toggle-slider {
+  transform: translateX(20px);
+}
+
+/* Auto-skip indicator */
+.auto-skip-indicator {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #111;
+  background: #4ade80;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Active state for control buttons */
+.ctrl-btn.active {
+  color: var(--accent);
+  background: rgba(255, 186, 222, 0.2);
+}
+
+/* PiP indicator when active */
+.ctrl-btn.active svg {
+  fill: var(--accent);
+}

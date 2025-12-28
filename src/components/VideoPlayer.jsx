@@ -21,7 +21,8 @@ const loadPlayerSettings = () => {
     muted: false,
     playbackSpeed: 1,
     subtitleSize: 'medium',
-    subtitleBg: 'semi'
+    subtitleBg: 'semi',
+    autoSkip: false
   }
 }
 
@@ -34,7 +35,7 @@ const savePlayerSettings = (settings) => {
   }
 }
 
-export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPrev, hasNext, hasPrev, animeId, savedTimestamp = 0, onProgressUpdate }) {
+export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPrev, hasNext, hasPrev, animeId, savedTimestamp = 0, onProgressUpdate, onTheaterModeChange }) {
   const containerRef = useRef(null)
   const videoRef = useRef(null)
   const hlsRef = useRef(null)
@@ -78,6 +79,11 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   // Subtitle styling
   const [subtitleSize, setSubtitleSize] = useState(savedSettings.subtitleSize)
   const [subtitleBg, setSubtitleBg] = useState(savedSettings.subtitleBg)
+  
+  // New features
+  const [autoSkip, setAutoSkip] = useState(savedSettings.autoSkip)
+  const [theaterMode, setTheaterMode] = useState(false)
+  const [isPiP, setIsPiP] = useState(false)
 
   // Save settings when they change
   useEffect(() => {
@@ -86,9 +92,15 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
       muted,
       playbackSpeed,
       subtitleSize,
-      subtitleBg
+      subtitleBg,
+      autoSkip
     })
-  }, [volume, muted, playbackSpeed, subtitleSize, subtitleBg])
+  }, [volume, muted, playbackSpeed, subtitleSize, subtitleBg, autoSkip])
+  
+  // Notify parent about theater mode changes
+  useEffect(() => {
+    onTheaterModeChange?.(theaterMode)
+  }, [theaterMode, onTheaterModeChange])
 
   // Reset on episode change
   useEffect(() => {
@@ -253,20 +265,36 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     }
   }, [episodeId, duration, onProgressUpdate])
 
-  // Check if we should show skip buttons
+  // Check if we should show skip buttons or auto-skip
   useEffect(() => {
     if (intro && currentTime >= intro.start && currentTime < intro.end) {
-      setShowSkipIntro(true)
+      if (autoSkip) {
+        // Auto-skip intro
+        if (videoRef.current) {
+          videoRef.current.currentTime = intro.end
+        }
+      } else {
+        setShowSkipIntro(true)
+      }
     } else {
       setShowSkipIntro(false)
     }
     
     if (outro && currentTime >= outro.start && currentTime < outro.end) {
-      setShowSkipOutro(true)
+      if (autoSkip) {
+        // Auto-skip outro (go to next episode if available)
+        if (hasNext && onNext) {
+          onNext()
+        } else if (videoRef.current) {
+          videoRef.current.currentTime = outro.end
+        }
+      } else {
+        setShowSkipOutro(true)
+      }
     } else {
       setShowSkipOutro(false)
     }
-  }, [currentTime, intro, outro])
+  }, [currentTime, intro, outro, autoSkip, hasNext, onNext])
 
   const skipIntro = () => {
     if (videoRef.current && intro) {
@@ -414,11 +442,51 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     if (!document.fullscreenElement) {
       containerRef.current?.requestFullscreen()
       setFullscreen(true)
+      setTheaterMode(false)
     } else {
       document.exitFullscreen()
       setFullscreen(false)
     }
   }, [])
+  
+  const toggleTheaterMode = useCallback(() => {
+    if (fullscreen) {
+      document.exitFullscreen()
+      setFullscreen(false)
+    }
+    setTheaterMode(prev => !prev)
+  }, [fullscreen])
+  
+  const togglePiP = useCallback(async () => {
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture()
+        setIsPiP(false)
+      } else if (videoRef.current && document.pictureInPictureEnabled) {
+        await videoRef.current.requestPictureInPicture()
+        setIsPiP(true)
+      }
+    } catch (err) {
+      console.error('PiP error:', err)
+    }
+  }, [])
+  
+  // Listen for PiP changes
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    
+    const handlePiPEnter = () => setIsPiP(true)
+    const handlePiPLeave = () => setIsPiP(false)
+    
+    video.addEventListener('enterpictureinpicture', handlePiPEnter)
+    video.addEventListener('leavepictureinpicture', handlePiPLeave)
+    
+    return () => {
+      video.removeEventListener('enterpictureinpicture', handlePiPEnter)
+      video.removeEventListener('leavepictureinpicture', handlePiPLeave)
+    }
+  }, [videoReady])
 
   const handleRetry = () => {
     setLoading(true)
@@ -443,18 +511,20 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
         case ' ':
         case 'k': e.preventDefault(); togglePlay(); break
         case 'f': toggleFullscreen(); break
+        case 't': toggleTheaterMode(); break
+        case 'i': togglePiP(); break
         case 'n': if (hasNext) onNext?.(); break
         case 'p': if (hasPrev) onPrev?.(); break
         case 'm': toggleMute(); break
         case 'arrowleft': if (videoRef.current) videoRef.current.currentTime -= 10; break
         case 'arrowright': if (videoRef.current) videoRef.current.currentTime += 10; break
-        case 'escape': setShowSettings(false); break
+        case 'escape': setShowSettings(false); if (theaterMode) setTheaterMode(false); break
         case 's': if (showSkipIntro) skipIntro(); else if (showSkipOutro) skipOutro(); break
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [hasNext, hasPrev, onNext, onPrev, toggleFullscreen, playing, showSkipIntro, showSkipOutro])
+  }, [hasNext, hasPrev, onNext, onPrev, toggleFullscreen, toggleTheaterMode, togglePiP, playing, showSkipIntro, showSkipOutro, theaterMode])
 
   if (!episodeId) {
     return (
@@ -490,7 +560,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   }
 
   return (
-    <div ref={containerRef} className={`player ${fullscreen ? 'fullscreen' : ''}`} onClick={togglePlay}>
+    <div ref={containerRef} className={`player ${fullscreen ? 'fullscreen' : ''} ${theaterMode ? 'theater' : ''}`} onClick={togglePlay}>
       {loading && (
         <div className="player-loader">
           <div className="spinner"></div>
@@ -611,6 +681,16 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
               <option value={2}>2x</option>
             </select>
           </div>
+          
+          <div className="settings-section toggle-section">
+            <label>Auto-skip Intro/Outro</label>
+            <button 
+              className={`toggle-btn ${autoSkip ? 'active' : ''}`}
+              onClick={() => setAutoSkip(!autoSkip)}
+            >
+              <span className="toggle-slider"></span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -679,11 +759,31 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
               <span className="subtitle-indicator">CC</span>
             )}
             
+            {autoSkip && (
+              <span className="auto-skip-indicator" title="Auto-skip enabled">AUTO</span>
+            )}
+            
             <button className="ctrl-btn" onClick={() => setShowSettings(!showSettings)} title="Settings">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
             </button>
             
-            <button className="ctrl-btn" onClick={toggleFullscreen}>
+            {/* Picture-in-Picture button */}
+            {document.pictureInPictureEnabled && (
+              <button className={`ctrl-btn ${isPiP ? 'active' : ''}`} onClick={togglePiP} title="Picture-in-Picture (I)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/>
+                </svg>
+              </button>
+            )}
+            
+            {/* Theater mode button */}
+            <button className={`ctrl-btn ${theaterMode ? 'active' : ''}`} onClick={toggleTheaterMode} title="Theater Mode (T)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z"/>
+              </svg>
+            </button>
+            
+            <button className="ctrl-btn" onClick={toggleFullscreen} title="Fullscreen (F)">
               {fullscreen ? (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16h3v3h2v-5H5zm3-8H5v2h5V5H8zm6 11h2v-3h3v-2h-5zm2-11V5h-2v5h5V8z"/></svg>
               ) : (

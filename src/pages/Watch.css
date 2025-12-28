@@ -327,6 +327,28 @@
   overflow: hidden;
 }
 
+.info-desc-full {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.info-desc-full::-webkit-scrollbar {
+  width: 4px;
+}
+
+.info-desc-full::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.info-desc-full::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 4px;
+}
+
 .info-link {
   display: inline-flex;
   align-items: center;
@@ -515,4 +537,76 @@
   .season-label {
     font-size: 0.7rem;
   }
+}
+
+
+/* Theater Mode */
+.watch-page.theater-active {
+  padding-top: 0;
+}
+
+.watch-page.theater-active .watch-main {
+  max-width: 100%;
+  padding: 0;
+}
+
+.watch-page.theater-active .watch-breadcrumb {
+  display: none;
+}
+
+.watch-page.theater-active .watch-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  grid-template-columns: unset;
+}
+
+.watch-page.theater-active .watch-left {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.watch-page.theater-active .player-wrapper {
+  width: 100%;
+  height: 80vh;
+  aspect-ratio: unset;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.watch-page.theater-active .watch-controls {
+  width: 100%;
+  max-width: 1400px;
+  margin: 16px auto;
+  padding: 12px 24px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.watch-page.theater-active .episodes-section {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 16px;
+  padding: 16px 24px;
+  box-sizing: border-box;
+}
+
+.watch-page.theater-active .seasons-section {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 16px;
+  padding: 16px 24px;
+  box-sizing: border-box;
+}
+
+.watch-page.theater-active .watch-right {
+  display: none;
+}
+
+/* Fix episodes grid in theater mode */
+.watch-page.theater-active .episodes-grid {
+  max-height: none;
 }
