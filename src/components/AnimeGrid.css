@@ -34,16 +34,8 @@
 }
 
 @media (max-width: 768px) {
-  .anime-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .anime-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+  .anime-section {
+    margin-bottom: 30px;
   }
   
   .section-header {
@@ -52,5 +44,33 @@
   
   .section-title {
     font-size: 1.1rem;
+  }
+  
+  .view-all {
+    font-size: 0.75rem;
+  }
+  
+  .anime-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .anime-section {
+    margin-bottom: 24px;
+  }
+  
+  .section-header {
+    margin-bottom: 10px;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .anime-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 6px;
   }
 }

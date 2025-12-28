@@ -13,6 +13,7 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--bg-tertiary);
+  max-height: 200px;
 }
 
 .card-image img {
@@ -282,17 +283,22 @@
 }
 
 @media (max-width: 768px) {
+  .card-image {
+    max-height: 150px;
+    border-radius: var(--radius-md);
+  }
+  
   .card-info {
-    padding: var(--space-2) var(--space-1);
+    padding: var(--space-2) 0;
   }
   
   .card-title {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     margin-bottom: 2px;
   }
   
   .card-meta {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     gap: var(--space-1);
   }
   
@@ -302,34 +308,50 @@
     gap: 2px;
   }
   
+  .badge {
+    font-size: 0.55rem;
+    padding: 1px 4px;
+  }
+  
   .card-rating {
     top: var(--space-1);
     right: var(--space-1);
     padding: 2px 4px;
-    font-size: 0.65rem;
-  }
-  
-  .card-play {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-@media (max-width: 480px) {
-  .card-image {
-    border-radius: var(--radius-md);
-  }
-  
-  .card-title {
-    font-size: 0.75rem;
-  }
-  
-  .card-meta {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
   
   .card-play {
     width: 36px;
     height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-image {
+    max-height: 130px;
+    border-radius: 6px;
+  }
+  
+  .card-info {
+    padding: 4px 0;
+  }
+  
+  .card-title {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+  
+  .card-meta {
+    font-size: 0.6rem;
+  }
+  
+  .card-play {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .badge {
+    font-size: 0.5rem;
+    padding: 1px 3px;
   }
 }

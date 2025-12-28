@@ -270,6 +270,7 @@
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--bg-secondary);
+  max-height: 220px;
 }
 
 .browse-card .card-img img {
@@ -488,6 +489,10 @@
     gap: 10px;
   }
   
+  .browse-card .card-img {
+    max-height: 160px;
+  }
+  
   .browse-card .card-title {
     font-size: 0.75rem;
   }
@@ -522,8 +527,12 @@
   }
   
   .results-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
+  }
+  
+  .browse-card .card-img {
+    max-height: 140px;
   }
   
   .browse-card .card-title {
