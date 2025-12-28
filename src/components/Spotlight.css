@@ -229,15 +229,15 @@
 
 @media (max-width: 768px) {
   .spotlight {
-    height: 360px;
+    height: 300px;
   }
 
   .spotlight-title {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
   
   .spotlight-info {
-    max-width: 85%;
+    max-width: 90%;
   }
 
   .spotlight-desc {
@@ -250,35 +250,69 @@
   
   .spotlight-actions {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
   }
   
   .btn-watch, .btn-detail {
-    padding: 8px 16px;
-    font-size: 0.8rem;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+  
+  .spotlight-rank {
+    font-size: 0.6rem;
+    padding: 3px 8px;
+    margin-bottom: 8px;
+  }
+  
+  .spotlight-meta {
+    margin-bottom: 8px;
+  }
+  
+  .meta-tag {
+    font-size: 0.65rem;
   }
 }
 
 @media (max-width: 480px) {
   .spotlight {
-    height: 320px;
+    height: 260px;
   }
   
   .spotlight-title {
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     -webkit-line-clamp: 2;
   }
   
   .spotlight-meta {
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+    gap: 4px;
   }
   
   .meta-tag {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
   
   .spotlight-rank {
-    font-size: 0.65rem;
-    padding: 3px 10px;
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    margin-bottom: 6px;
+  }
+  
+  .btn-watch, .btn-detail {
+    padding: 6px 12px;
+    font-size: 0.7rem;
+  }
+  
+  .spotlight-nav {
+    bottom: 20px;
+  }
+  
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .nav-dot.active {
+    width: 18px;
   }
 }

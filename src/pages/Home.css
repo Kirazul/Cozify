@@ -780,24 +780,30 @@
 
 @media (max-width: 768px) {
   .hero {
-    height: 65vh;
-    min-height: 400px;
-    max-height: 550px;
+    height: 50vh;
+    min-height: 320px;
+    max-height: 420px;
   }
 
   .hero-content {
     padding: 0 var(--space-4);
-    bottom: 18%;
+    bottom: 12%;
     max-width: 100%;
   }
   
+  .hero-overlay::after {
+    height: 180px;
+  }
+  
   .hero-title {
-    font-size: clamp(1.4rem, 5vw, 1.8rem);
+    font-size: clamp(1.2rem, 5vw, 1.6rem);
+    margin-bottom: 8px;
   }
   
   .hero-meta {
-    font-size: 0.8rem;
-    gap: 8px;
+    font-size: 0.75rem;
+    gap: 6px;
+    margin-bottom: 10px;
   }
 
   .hero-desc {
@@ -809,47 +815,64 @@
   }
   
   .hero-dots {
-    bottom: 80px;
+    bottom: 60px;
   }
   
   .dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   
   .dot.active {
-    width: 24px;
+    width: 20px;
   }
 
   .section {
-    padding: 24px 0;
+    padding: 20px 0;
   }
   
   .section:first-of-type {
-    margin-top: -50px;
+    margin-top: -30px;
   }
   
   .section-title {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+  }
+  
+  .section-header {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .trending-row {
+    justify-content: flex-start;
+    gap: 12px;
+    padding-left: var(--space-4);
   }
 
   .trending-item {
-    width: 110px;
+    width: 100px;
+  }
+  
+  .trending-item h3 {
+    font-size: 0.7rem;
+    margin-top: 6px;
   }
 
   .trending-rank {
-    font-size: 2.2rem;
-    left: -5px;
+    font-size: 2rem;
+    left: -4px;
+    bottom: 38px;
   }
 
   .anime-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px 10px;
+    gap: 12px 8px;
   }
 
   .schedule-preview {
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 6px;
   }
 
   .schedule-day:nth-child(n+5) {
@@ -857,74 +880,102 @@
   }
   
   .schedule-day {
-    padding: 14px 10px;
+    padding: 12px 8px;
   }
   
   .day-name {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
   
   .day-count {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 }
 
 @media (max-width: 480px) {
   .hero {
-    height: 55vh;
-    min-height: 350px;
+    height: 45vh;
+    min-height: 280px;
+    max-height: 360px;
   }
   
   .hero-content {
-    bottom: 15%;
+    bottom: 10%;
+    padding: 0 var(--space-3);
   }
 
   .hero-title {
-    font-size: 1.3rem;
-    margin-bottom: 8px;
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   
   .hero-badge {
-    font-size: 0.6rem;
-    padding: 3px 10px;
-    margin-bottom: 8px;
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    margin-bottom: 6px;
   }
   
   .hero-meta {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    font-size: 0.7rem;
   }
 
   .hero-actions {
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
+    flex-wrap: wrap;
   }
 
-  .btn-primary, .btn-secondary {
-    width: 100%;
+  .btn-primary {
+    flex: 1;
+    min-width: 0;
     justify-content: center;
-    padding: 12px 20px;
-    font-size: 0.85rem;
+    padding: 10px 16px;
+    font-size: 0.8rem;
+  }
+  
+  .btn-secondary {
+    padding: 10px 16px;
+    font-size: 0.8rem;
+  }
+  
+  .hero-dots {
+    bottom: 50px;
+  }
+  
+  .trending-row {
+    gap: 10px;
+    padding-left: var(--space-3);
   }
   
   .trending-item {
-    width: 95px;
+    width: 85px;
   }
   
   .trending-item h3 {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
+  }
+  
+  .trending-rank {
+    font-size: 1.6rem;
+    bottom: 32px;
   }
 
   .anime-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px 8px;
+    gap: 10px 6px;
   }
   
   .anime-card h3 {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
   
   .card-type {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
   
   .schedule-preview {

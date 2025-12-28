@@ -181,11 +181,6 @@ ul, ol {
     font-size: 13px;
   }
   
-  /* Improve touch targets */
-  button, a, input, select {
-    min-height: 44px;
-  }
-  
   /* Prevent text size adjustment on orientation change */
   body {
     -webkit-text-size-adjust: 100%;

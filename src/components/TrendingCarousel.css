@@ -160,40 +160,70 @@
 }
 
 @media (max-width: 768px) {
-  .trending-card {
-    width: 120px;
-  }
-
-  .trending-rank {
-    font-size: 2.2rem;
-    left: -5px;
-    bottom: 42px;
+  .trending-section {
+    margin-bottom: 30px;
   }
   
-  .trending-info h3 {
-    font-size: 0.8rem;
+  .trending-header {
+    margin-bottom: 12px;
   }
-}
-
-@media (max-width: 480px) {
+  
+  .trending-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .trending-scroll {
+    gap: 12px;
+    padding-left: 0;
+  }
+  
   .trending-card {
     width: 100px;
   }
 
   .trending-rank {
-    font-size: 1.8rem;
+    font-size: 2rem;
+    left: -4px;
     bottom: 38px;
   }
   
   .trending-info {
-    padding: 8px 2px 2px;
+    padding: 6px 2px 2px;
   }
   
   .trending-info h3 {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .trending-section {
+    margin-bottom: 24px;
   }
   
   .trending-header h2 {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+  
+  .trending-scroll {
+    gap: 10px;
+  }
+  
+  .trending-card {
+    width: 85px;
+  }
+
+  .trending-rank {
+    font-size: 1.6rem;
+    bottom: 32px;
+  }
+  
+  .trending-info h3 {
+    font-size: 0.65rem;
+  }
+  
+  .arrow-btn {
+    width: 28px;
+    height: 28px;
   }
 }

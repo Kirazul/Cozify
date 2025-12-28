@@ -389,31 +389,43 @@
 /* Responsive */
 @media (max-width: 768px) {
   .browse-page {
-    padding-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
   }
 
   .browse-header-section {
-    padding: 90px 0 var(--space-5);
+    padding: 70px 0 var(--space-4);
+  }
+  
+  .browse-header-section .container {
+    gap: var(--space-3);
   }
   
   .browse-header-section h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
   
   .browse-search {
     padding: 0 var(--space-3);
+    max-width: 100%;
   }
   
   .browse-search input {
-    padding: 12px 40px 12px 44px;
-    font-size: 0.9rem;
+    padding: 10px 36px 10px 40px;
+    font-size: 0.85rem;
+  }
+  
+  .browse-search .search-icon {
+    left: 14px;
+    width: 16px;
+    height: 16px;
   }
   
   .type-tabs {
     width: auto;
-    max-width: 100%;
+    max-width: calc(100vw - 32px);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding: 4px;
   }
   
   .type-tabs::-webkit-scrollbar {
@@ -422,13 +434,15 @@
   
   .type-tab {
     white-space: nowrap;
-    padding: var(--space-2) var(--space-3);
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    min-height: auto;
   }
   
   .browse-content {
     grid-template-columns: 1fr;
-    gap: var(--space-4);
+    gap: var(--space-3);
+    margin-top: var(--space-4);
   }
   
   .genre-sidebar {
@@ -444,10 +458,10 @@
   .genre-list {
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: var(--space-2);
+    gap: 6px;
     max-height: none;
     overflow-x: auto;
-    padding-bottom: var(--space-2);
+    padding-bottom: 6px;
     -webkit-overflow-scrolling: touch;
   }
   
@@ -456,54 +470,70 @@
   }
   
   .genre-btn {
-    padding: var(--space-2) var(--space-4);
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    font-size: 0.7rem;
     background: var(--bg-secondary);
     border-radius: var(--radius-full);
     white-space: nowrap;
     flex-shrink: 0;
+    min-height: auto;
+  }
+  
+  .results-header {
+    margin-bottom: var(--space-3);
   }
   
   .results-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-3);
-  }
-  
-  .browse-card .card-title {
-    font-size: 0.8rem;
-  }
-  
-  .results-header h2 {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .browse-header-section {
-    padding: 80px 0 var(--space-4);
-  }
-  
-  .browse-header-section h1 {
-    font-size: 1.3rem;
-  }
-  
-  .browse-search input {
-    padding: 10px 36px 10px 40px;
-    font-size: 0.85rem;
-  }
-  
-  .results-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-2);
+    gap: 10px;
   }
   
   .browse-card .card-title {
     font-size: 0.75rem;
   }
   
-  .load-more-btn {
-    padding: var(--space-2) var(--space-4);
+  .results-header h2 {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .browse-header-section {
+    padding: 64px 0 var(--space-3);
+  }
+  
+  .browse-header-section h1 {
+    font-size: 1.15rem;
+  }
+  
+  .browse-search input {
+    padding: 8px 32px 8px 36px;
     font-size: 0.8rem;
+  }
+  
+  .type-tab {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+  
+  .genre-btn {
+    padding: 5px 10px;
+    font-size: 0.65rem;
+  }
+  
+  .results-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .browse-card .card-title {
+    font-size: 0.7rem;
+  }
+  
+  .load-more-btn {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    min-height: auto;
   }
 }
 
