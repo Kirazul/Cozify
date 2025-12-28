@@ -12,6 +12,7 @@ export default function PageTransition({ children }) {
   const [contentVisible, setContentVisible] = useState(false)
   const lastPathRef = useRef('')
   const timerRef = useRef(null)
+  const timeoutRef = useRef(null)
   const fromLandingRef = useRef(false)
 
   // Use layoutEffect to immediately hide content before paint
@@ -46,17 +47,41 @@ export default function PageTransition({ children }) {
       window.scrollTo(0, 0)
     }
   }, [location.pathname, resetLoading])
+  
+  // Fallback timeout - force show content after 5 seconds max
+  useEffect(() => {
+    if (!showLoader) return
+    
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => {
+      console.log('Loading timeout - forcing page display')
+      setLoaderExiting(true)
+      setTimeout(() => {
+        setShowLoader(false)
+        setLoaderExiting(false)
+        setContentVisible(true)
+      }, 400)
+    }, 5000)
+    
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [showLoader, location.pathname])
 
   // Clear timers on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [])
 
   // Watch for page loaded state
   useEffect(() => {
     if (!isPageLoaded || !showLoader) return
+    
+    // Clear timeout since page loaded
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
     
     // Clear any existing timer
     if (timerRef.current) clearTimeout(timerRef.current)

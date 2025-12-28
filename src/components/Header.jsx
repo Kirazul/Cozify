@@ -85,7 +85,7 @@ export default function Header() {
           </Link>
 
           <nav className={`nav ${mobileMenuOpen ? 'open' : ''}`}>
-            <Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link>
+            <Link to="/home" className={isActive('/home') || isActive('/') ? 'active' : ''}>Home</Link>
             <Link to="/browse" className={isActive('/browse') ? 'active' : ''}>Browse</Link>
             <Link to="/schedule" className={isActive('/schedule') ? 'active' : ''}>Schedule</Link>
           </nav>

@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
 import { useLoading } from '../contexts/LoadingContext'
 import VideoPlayer from '../components/VideoPlayer'
-import { addToHistory, markEpisodeCompleted, isEpisodeWatched, addWatchTime } from '../services/userService'
+import { addToHistory, markEpisodeCompleted, isEpisodeWatched, addWatchTime, saveWatchProgress, getAnimeProgress } from '../services/userService'
 import './Watch.css'
 
 export default function Watch() {
@@ -20,12 +20,28 @@ export default function Watch() {
   const watchIntervalRef = useRef(null)
   const hasCountedRef = useRef(false)
   const lastSaveRef = useRef(0)
+  
+  // Resume timestamp - use null to indicate "not yet loaded"
+  const [savedProgress, setSavedProgress] = useState(null)
 
   const episodes = anime?.episodes || []
   const currentEp = episodes.find(ep => ep.id === episodeId)
   const currentIdx = episodes.findIndex(ep => ep.id === episodeId)
   const prevEp = currentIdx > 0 ? episodes[currentIdx - 1] : null
   const nextEp = currentIdx < episodes.length - 1 ? episodes[currentIdx + 1] : null
+
+  // Load saved progress when episode changes - runs immediately
+  useEffect(() => {
+    const progress = getAnimeProgress(animeId)
+    console.log('Loading progress for', animeId, episodeId, progress)
+    if (progress && progress.episodeId === episodeId && progress.timestamp > 10) {
+      console.log('Found saved progress:', progress.timestamp)
+      setSavedProgress(progress.timestamp)
+    } else {
+      console.log('No saved progress found')
+      setSavedProgress(0) // No saved progress, set to 0
+    }
+  }, [animeId, episodeId])
 
   useEffect(() => {
     const fetchAnime = async () => {
@@ -161,6 +177,12 @@ export default function Watch() {
     navigate(`/watch/${animeId}/${epId}`)
   }
 
+  // Handle progress updates from video player
+  const handleProgressUpdate = useCallback((timestamp, duration) => {
+    console.log('Saving progress:', animeId, episodeId, timestamp)
+    saveWatchProgress(animeId, episodeId, timestamp, duration)
+  }, [animeId, episodeId])
+
   return (
     <div className="watch-page">
       <main className="watch-main">
@@ -175,15 +197,21 @@ export default function Watch() {
         <div className="watch-content">
           <div className="watch-left">
             <div className="player-wrapper">
-              <VideoPlayer 
-                episodeId={episodeId}
-                audioType={audioType}
-                hasNext={!!nextEp}
-                hasPrev={!!prevEp}
-                onNext={() => nextEp && goToEpisode(nextEp.id)}
-                onPrev={() => prevEp && goToEpisode(prevEp.id)}
-                onAudioTypeChange={setAudioType}
-              />
+              {savedProgress !== null && (
+                <VideoPlayer 
+                  key={`${episodeId}-${savedProgress}`}
+                  episodeId={episodeId}
+                  audioType={audioType}
+                  hasNext={!!nextEp}
+                  hasPrev={!!prevEp}
+                  onNext={() => nextEp && goToEpisode(nextEp.id)}
+                  onPrev={() => prevEp && goToEpisode(prevEp.id)}
+                  onAudioTypeChange={setAudioType}
+                  animeId={animeId}
+                  savedTimestamp={savedProgress}
+                  onProgressUpdate={handleProgressUpdate}
+                />
+              )}
             </div>
 
             <div className="watch-controls">

@@ -593,18 +593,66 @@
 
 /* Video subtitles styling */
 video::cue {
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.75);
   color: white;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  padding: 8px 16px;
-  border-radius: 6px;
-  line-height: 1.5;
+  padding: 4px 12px;
+  border-radius: 4px;
+  line-height: 1.4;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
   font-weight: 500;
 }
 
-/* Fullscreen subtitles even bigger */
-.player.fullscreen video::cue {
+/* Subtitle Size Options */
+.sub-size-small::cue {
+  font-size: 1rem;
+}
+
+.sub-size-medium::cue {
+  font-size: 1.5rem;
+}
+
+.sub-size-large::cue {
+  font-size: 2rem;
+}
+
+.sub-size-xlarge::cue {
   font-size: 2.5rem;
+}
+
+/* Subtitle Background Options */
+.sub-bg-none::cue {
+  background: transparent;
+  text-shadow: 
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000,
+    0 0 8px rgba(0, 0, 0, 0.9);
+}
+
+.sub-bg-semi::cue {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.sub-bg-solid::cue {
+  background: rgba(0, 0, 0, 1);
+}
+
+/* Fullscreen subtitle adjustments */
+.player.fullscreen .sub-size-small::cue {
+  font-size: 1.25rem;
+}
+
+.player.fullscreen .sub-size-medium::cue {
+  font-size: 1.75rem;
+}
+
+.player.fullscreen .sub-size-large::cue {
+  font-size: 2.5rem;
+}
+
+.player.fullscreen .sub-size-xlarge::cue {
+  font-size: 3rem;
 }

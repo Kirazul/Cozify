@@ -1,26 +1,64 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import Hls from 'hls.js'
+import ResumeModal from './ResumeModal'
 import './VideoPlayer.css'
 
 const API_BASE = 'https://cozify-api.deno.dev'
+const PLAYER_SETTINGS_KEY = 'cozify_player_settings'
 
-export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPrev, hasNext, hasPrev }) {
+// Load saved settings from localStorage
+const loadPlayerSettings = () => {
+  try {
+    const saved = localStorage.getItem(PLAYER_SETTINGS_KEY)
+    if (saved) {
+      return JSON.parse(saved)
+    }
+  } catch (e) {
+    console.error('Failed to load player settings:', e)
+  }
+  return {
+    volume: 1,
+    muted: false,
+    playbackSpeed: 1,
+    subtitleSize: 'medium',
+    subtitleBg: 'semi'
+  }
+}
+
+// Save settings to localStorage
+const savePlayerSettings = (settings) => {
+  try {
+    localStorage.setItem(PLAYER_SETTINGS_KEY, JSON.stringify(settings))
+  } catch (e) {
+    console.error('Failed to save player settings:', e)
+  }
+}
+
+export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPrev, hasNext, hasPrev, animeId, savedTimestamp = 0, onProgressUpdate }) {
   const containerRef = useRef(null)
   const videoRef = useRef(null)
   const hlsRef = useRef(null)
   const idleTimerRef = useRef(null)
   const trackRef = useRef(null)
+  const progressSaveRef = useRef(null)
+  
+  // Load saved settings on mount
+  const savedSettings = loadPlayerSettings()
   
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showControls, setShowControls] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   
+  // Resume modal state
+  const [showResumeModal, setShowResumeModal] = useState(false)
+  const [videoReady, setVideoReady] = useState(false)
+  
   const [playing, setPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(1)
-  const [muted, setMuted] = useState(false)
+  const [volume, setVolume] = useState(savedSettings.volume)
+  const [muted, setMuted] = useState(savedSettings.muted)
   const [fullscreen, setFullscreen] = useState(false)
   const [seeking, setSeeking] = useState(false)
   
@@ -33,9 +71,24 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
   // Settings state
   const [subtitles, setSubtitles] = useState([])
   const [currentSubtitle, setCurrentSubtitle] = useState('off')
-  const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  const [playbackSpeed, setPlaybackSpeed] = useState(savedSettings.playbackSpeed)
   const [qualities, setQualities] = useState([])
   const [currentQuality, setCurrentQuality] = useState(-1)
+  
+  // Subtitle styling
+  const [subtitleSize, setSubtitleSize] = useState(savedSettings.subtitleSize)
+  const [subtitleBg, setSubtitleBg] = useState(savedSettings.subtitleBg)
+
+  // Save settings when they change
+  useEffect(() => {
+    savePlayerSettings({
+      volume,
+      muted,
+      playbackSpeed,
+      subtitleSize,
+      subtitleBg
+    })
+  }, [volume, muted, playbackSpeed, subtitleSize, subtitleBg])
 
   // Reset on episode change
   useEffect(() => {
@@ -52,6 +105,8 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     setOutro(null)
     setShowSkipIntro(false)
     setShowSkipOutro(false)
+    setShowResumeModal(false)
+    setVideoReady(false)
   }, [episodeId, audioType])
 
   // Cleanup
@@ -59,6 +114,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     return () => {
       if (hlsRef.current) hlsRef.current.destroy()
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
+      if (progressSaveRef.current) clearInterval(progressSaveRef.current)
     }
   }, [])
 
@@ -104,6 +160,10 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
         if (!video) return
 
         if (hlsRef.current) hlsRef.current.destroy()
+        
+        // Apply saved volume settings
+        video.volume = volume
+        video.muted = muted
 
         if (Hls.isSupported()) {
           const hls = new Hls({ enableWorker: true })
@@ -113,6 +173,7 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           
           hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
             setLoading(false)
+            setVideoReady(true)
             if (data.levels && data.levels.length > 0) {
               setQualities(data.levels.map((level, idx) => ({
                 index: idx,
@@ -120,9 +181,17 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
                 label: `${level.height}p`
               })))
             }
-            const playPromise = video.play()
-            if (playPromise !== undefined) {
-              playPromise.catch(() => {})
+            // Show resume modal if there's saved progress, otherwise auto-play
+            console.log('Video ready, savedTimestamp:', savedTimestamp)
+            if (savedTimestamp > 10) {
+              console.log('Showing resume modal')
+              setShowResumeModal(true)
+            } else {
+              console.log('Auto-playing from start')
+              const playPromise = video.play()
+              if (playPromise !== undefined) {
+                playPromise.catch(() => {})
+              }
             }
           })
           
@@ -134,11 +203,17 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
           })
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
           video.src = source.url
-          video.addEventListener('loadedmetadata', () => {
+          video.addEventListener('canplay', () => {
             setLoading(false)
-            const playPromise = video.play()
-            if (playPromise !== undefined) {
-              playPromise.catch(() => {})
+            setVideoReady(true)
+            // Show resume modal if there's saved progress, otherwise auto-play
+            if (savedTimestamp > 10) {
+              setShowResumeModal(true)
+            } else {
+              const playPromise = video.play()
+              if (playPromise !== undefined) {
+                playPromise.catch(() => {})
+              }
             }
           }, { once: true })
         }
@@ -149,7 +224,34 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     }
 
     loadSource()
-  }, [episodeId, audioType])
+  }, [episodeId, audioType, savedTimestamp])
+
+  // Save progress periodically and on unmount
+  useEffect(() => {
+    // Save progress every 5 seconds
+    progressSaveRef.current = setInterval(() => {
+      if (videoRef.current && onProgressUpdate && duration > 0) {
+        const currentPos = videoRef.current.currentTime
+        // Only save if we've watched at least 5 seconds and not near the end
+        if (currentPos > 5 && currentPos < duration - 30) {
+          onProgressUpdate(currentPos, duration)
+        }
+      }
+    }, 5000)
+
+    return () => {
+      // Save progress on unmount
+      if (progressSaveRef.current) {
+        clearInterval(progressSaveRef.current)
+      }
+      if (videoRef.current && onProgressUpdate && duration > 0) {
+        const currentPos = videoRef.current.currentTime
+        if (currentPos > 5 && currentPos < duration - 30) {
+          onProgressUpdate(currentPos, duration)
+        }
+      }
+    }
+  }, [episodeId, duration, onProgressUpdate])
 
   // Check if we should show skip buttons
   useEffect(() => {
@@ -179,6 +281,31 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
     } else if (videoRef.current && outro) {
       videoRef.current.currentTime = outro.end
       setShowSkipOutro(false)
+    }
+  }
+
+  // Resume modal handlers
+  const handleResume = () => {
+    setShowResumeModal(false)
+    if (videoRef.current) {
+      if (savedTimestamp > 0) {
+        videoRef.current.currentTime = savedTimestamp
+      }
+      const playPromise = videoRef.current.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {})
+      }
+    }
+  }
+
+  const handleStartOver = () => {
+    setShowResumeModal(false)
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0
+      const playPromise = videoRef.current.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {})
+      }
     }
   }
 
@@ -377,9 +504,18 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
         </div>
       )}
 
+      {/* Resume Modal */}
+      {showResumeModal && videoReady && (
+        <ResumeModal 
+          savedTime={savedTimestamp}
+          onResume={handleResume}
+          onStartOver={handleStartOver}
+        />
+      )}
+
       <video
         ref={videoRef}
-        className="player-video"
+        className={`player-video sub-size-${subtitleSize} sub-bg-${subtitleBg}`}
         onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
         onLoadedMetadata={() => setDuration(videoRef.current?.duration || 0)}
         onPlay={() => setPlaying(true)}
@@ -426,6 +562,29 @@ export default function VideoPlayer({ episodeId, audioType = 'sub', onNext, onPr
               ))}
             </select>
           </div>
+          
+          {currentSubtitle !== 'off' && (
+            <>
+              <div className="settings-section">
+                <label>Subtitle Size</label>
+                <select value={subtitleSize} onChange={e => setSubtitleSize(e.target.value)}>
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                  <option value="xlarge">Extra Large</option>
+                </select>
+              </div>
+              
+              <div className="settings-section">
+                <label>Subtitle Background</label>
+                <select value={subtitleBg} onChange={e => setSubtitleBg(e.target.value)}>
+                  <option value="none">None</option>
+                  <option value="semi">Semi-transparent</option>
+                  <option value="solid">Solid Black</option>
+                </select>
+              </div>
+            </>
+          )}
           
           {qualities.length > 0 && (
             <div className="settings-section">

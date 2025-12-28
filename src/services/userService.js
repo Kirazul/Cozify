@@ -6,7 +6,8 @@ const STORAGE_KEYS = {
   STATS: 'cozify_stats',
   ACHIEVEMENTS: 'cozify_achievements',
   FIRST_VISIT: 'cozify_first_visit',
-  WATCHED_EPISODES: 'cozify_watched_eps'
+  WATCHED_EPISODES: 'cozify_watched_eps',
+  WATCH_PROGRESS: 'cozify_watch_progress'
 }
 
 // Trophies (achievements renamed)
@@ -58,6 +59,9 @@ export function initUser() {
   }
   if (!localStorage.getItem(STORAGE_KEYS.WATCHED_EPISODES)) {
     localStorage.setItem(STORAGE_KEYS.WATCHED_EPISODES, JSON.stringify([]))
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)) {
+    localStorage.setItem(STORAGE_KEYS.WATCH_PROGRESS, JSON.stringify({}))
   }
 }
 
@@ -288,4 +292,32 @@ export function getTrophyProgress(trophy, stats) {
 // Clear all data
 export function clearAllData() {
   Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key))
+}
+
+// Watch progress operations (for resume functionality)
+export function saveWatchProgress(animeId, episodeId, timestamp, duration) {
+  const progress = getWatchProgress()
+  progress[animeId] = {
+    episodeId,
+    timestamp,
+    duration,
+    savedAt: Date.now()
+  }
+  localStorage.setItem(STORAGE_KEYS.WATCH_PROGRESS, JSON.stringify(progress))
+}
+
+export function getWatchProgress() {
+  const data = localStorage.getItem(STORAGE_KEYS.WATCH_PROGRESS)
+  return data ? JSON.parse(data) : {}
+}
+
+export function getAnimeProgress(animeId) {
+  const progress = getWatchProgress()
+  return progress[animeId] || null
+}
+
+export function clearAnimeProgress(animeId) {
+  const progress = getWatchProgress()
+  delete progress[animeId]
+  localStorage.setItem(STORAGE_KEYS.WATCH_PROGRESS, JSON.stringify(progress))
 }
